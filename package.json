@@ -1,0 +1,55 @@
+{
+  "name": "6022-token",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf artifacts cache out",
+    "compile": "hardhat compile",
+    "lint": "$npm_execpath run lint:js && $npm_execpath run lint:sol",
+    "lint:fix": "eslint --fix '**/*.{js,ts,json}' && prettier --write . && solhint 'contracts/**/*.sol' --fix --noPrompt",
+    "lint:js": "eslint '**/*.{js,ts,json}' && prettier --check .",
+    "lint:sol": "solhint 'contracts/**/*.sol'",
+    "test": "hardhat test"
+  },
+  "resolutions": {
+    "ethers": "^5.7.2",
+    "hardhat-deploy": "^1.0.4"
+  },
+  "devDependencies": {
+    "@layerzerolabs/devtools-evm-hardhat": "^4.0.4",
+    "@layerzerolabs/io-devtools": "~0.3.2",
+    "@layerzerolabs/lz-definitions": "^3.0.151",
+    "@layerzerolabs/lz-v2-utilities": "^3.0.151",
+    "@layerzerolabs/metadata-tools": "^3.0.2",
+    "@layerzerolabs/oft-evm": "^4.0.1",
+    "@layerzerolabs/toolbox-hardhat": "~0.6.13",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@openzeppelin/contracts": "^5.4.0",
+    "@safe-global/safe-core-sdk-types": "^5.1.0",
+    "@typechain/ethers-v5": "^11.1.2",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "~18.18.14",
+    "chai": "^4.4.1",
+    "dotenv": "^17.2.3",
+    "ethers": "^5.7.2",
+    "hardhat": "^2.28.0",
+    "hardhat-contract-sizer": "^2.10.1",
+    "hardhat-deploy": "^1.0.4",
+    "mocha": "^11.7.5",
+    "solhint": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.16.0"
+  },
+  "overrides": {
+    "ethers": "^5.7.2",
+    "hardhat-deploy": "^1.0.4"
+  }
+}
