@@ -2,7 +2,7 @@ import assert from 'assert'
 
 import { type DeployFunction } from 'hardhat-deploy/types'
 
-const contractName = 'Token6022OFT'
+const contractName = 'Token6022BridgeToken'
 
 const deploy: DeployFunction = async (hre) => {
     const { getNamedAccounts, deployments } = hre
@@ -35,10 +35,16 @@ const deploy: DeployFunction = async (hre) => {
         return
     }
 
+    if (hre.network.config.ccipRouter == null) {
+        console.warn(`ccipRouter not defined in hardhat.config.ts, skipping deployment`)
+        return
+    }
+
     const { address } = await deploy(contractName, {
         from: deployer,
         args: [
             endpointV2Deployment.address,
+            hre.network.config.ccipRouter,
             deployer,
         ],
         log: true,

@@ -1,12 +1,12 @@
 import { expect } from 'chai'
 import { ContractFactory } from 'ethers'
 import { deployments, ethers } from 'hardhat'
-import { Token6022OFT } from '../../typechain-types'
+import { Token6022BridgeToken } from '../../typechain-types'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { reset, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 
-describe('When allowing funds of Token6022OFT', function () {
-    let _token6022Oft: Token6022OFT
+describe('When allowing funds of Token6022BridgeToken', function () {
+    let _token6022Oft: Token6022BridgeToken
 
     let _owner: SignerWithAddress
     let _otherAccount: SignerWithAddress
@@ -24,12 +24,16 @@ describe('When allowing funds of Token6022OFT', function () {
         )
         const endpoint = await endpointFactory.deploy(1)
         await endpoint.deployed()
+        const ccipRouterFactory = await ethers.getContractFactory('CCIPRouterMock', owner)
+        const ccipRouter = await ccipRouterFactory.deploy(16015286601757825753n)
+        await ccipRouter.deployed()
 
-        const tokenFactory = await ethers.getContractFactory('Token6022OFT', owner)
+        const tokenFactory = await ethers.getContractFactory('Token6022BridgeToken', owner)
         const token6022Oft = (await tokenFactory.deploy(
             endpoint.address,
+            ccipRouter.address,
             owner.address
-        )) as unknown as Token6022OFT
+        )) as unknown as Token6022BridgeToken
 
         return { token6022Oft, otherAccount, owner }
     }

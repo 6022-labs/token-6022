@@ -21,12 +21,12 @@ import type { OAppEnforcedOption, OAppOmniGraphHardhat, OmniPointHardhat } from 
  */
 const baseTestnetContract: OmniPointHardhat = {
     eid: EndpointId.BASESEP_V2_TESTNET,
-    contractName: 'Token6022OFT',
+    contractName: 'Token6022BridgeToken',
 }
 
 const amoyTestnetContract: OmniPointHardhat = {
     eid: EndpointId.AMOY_V2_TESTNET,
-    contractName: 'Token6022OFTAdapter',
+    contractName: 'Token6022BridgeAdapter',
 }
 
 const EVM_ENFORCED_OPTIONS: OAppEnforcedOption[] = [

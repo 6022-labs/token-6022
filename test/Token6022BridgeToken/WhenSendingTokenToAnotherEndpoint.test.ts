@@ -3,27 +3,28 @@ import { BigNumber, Contract, ContractFactory } from 'ethers'
 import { deployments, ethers } from 'hardhat'
 import { Options } from '@layerzerolabs/lz-v2-utilities'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { Token6022OFT, Token6022OFT__factory } from '../../typechain-types'
+import { Token6022BridgeToken, Token6022BridgeToken__factory } from '../../typechain-types'
 
-describe('WhenSendingTokenToAnotherEndpoint for Token6022OFT', function () {
+describe('WhenSendingTokenToAnotherEndpoint for Token6022BridgeToken', function () {
     const eidA = 1
     const eidB = 2
 
-    let Token6022OFTFactory: Token6022OFT__factory
+    let Token6022BridgeTokenFactory: Token6022BridgeToken__factory
     let EndpointV2Mock: ContractFactory
 
     let _ownerA: SignerWithAddress
     let _ownerB: SignerWithAddress
     let _endpointOwner: SignerWithAddress
 
-    let _token6022OftEndpointA: Token6022OFT
-    let _token6022OftEndpointB: Token6022OFT
+    let _token6022OftEndpointA: Token6022BridgeToken
+    let _token6022OftEndpointB: Token6022BridgeToken
 
     let _mockEndpointV2A: Contract
     let _mockEndpointV2B: Contract
+    let _ccipRouter: Contract
 
     before(async function () {
-        Token6022OFTFactory = (await ethers.getContractFactory('Token6022OFT')) as unknown as Token6022OFT__factory
+        Token6022BridgeTokenFactory = (await ethers.getContractFactory('Token6022BridgeToken')) as unknown as Token6022BridgeToken__factory
 
         const signers = await ethers.getSigners()
         ;[_ownerA, _ownerB, _endpointOwner] = signers
@@ -39,15 +40,20 @@ describe('WhenSendingTokenToAnotherEndpoint for Token6022OFT', function () {
     beforeEach(async function () {
         _mockEndpointV2A = await EndpointV2Mock.deploy(eidA)
         _mockEndpointV2B = await EndpointV2Mock.deploy(eidB)
+        const ccipRouterFactory = await ethers.getContractFactory('CCIPRouterMock')
+        _ccipRouter = await ccipRouterFactory.deploy(16015286601757825753n)
+        await _ccipRouter.deployed()
 
-        _token6022OftEndpointA = await Token6022OFTFactory.connect(_ownerA).deploy(
+        _token6022OftEndpointA = await Token6022BridgeTokenFactory.connect(_ownerA).deploy(
             _mockEndpointV2A.address,
+            _ccipRouter.address,
             _ownerA.address
         )
         await _token6022OftEndpointA.deployed()
 
-        _token6022OftEndpointB = await Token6022OFTFactory.connect(_ownerB).deploy(
+        _token6022OftEndpointB = await Token6022BridgeTokenFactory.connect(_ownerB).deploy(
             _mockEndpointV2B.address,
+            _ccipRouter.address,
             _ownerB.address
         )
         await _token6022OftEndpointB.deployed()
@@ -64,7 +70,7 @@ describe('WhenSendingTokenToAnotherEndpoint for Token6022OFT', function () {
     })
 
     async function creditTokens(
-        token: Token6022OFT,
+        token: Token6022BridgeToken,
         endpoint: Contract,
         recipient: SignerWithAddress,
         amountLD: BigNumber,

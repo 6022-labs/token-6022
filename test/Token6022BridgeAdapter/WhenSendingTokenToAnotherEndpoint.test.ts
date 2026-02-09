@@ -3,14 +3,14 @@ import { deployments, ethers } from 'hardhat'
 import { Contract, ContractFactory } from 'ethers'
 import { Options } from '@layerzerolabs/lz-v2-utilities'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { Token6022OFTAdapter, Token6022OFTAdapter__factory, Token6022, Token6022__factory } from '../../typechain-types'
+import { Token6022BridgeAdapter, Token6022BridgeAdapter__factory, Token6022, Token6022__factory } from '../../typechain-types'
 
 describe('WhenSendingTokenToAnotherEndpoint', function () {
     // Constant representing a mock Endpoint ID for testing purposes
     const eidA = 1
     const eidB = 2
 
-    let LayerZeroOFTAdapter: Token6022OFTAdapter__factory
+    let LayerZeroOFTAdapter: Token6022BridgeAdapter__factory
     let Token6022: Token6022__factory
     let EndpointV2Mock: ContractFactory
 
@@ -21,17 +21,18 @@ describe('WhenSendingTokenToAnotherEndpoint', function () {
     let _token6022EndpointA: Token6022
     let _token6022EndpointB: Token6022
 
-    let _layerZeroOFTAdapterEndpointA: Token6022OFTAdapter
-    let _layerZeroOFTAdapterEndpointB: Token6022OFTAdapter
+    let _layerZeroOFTAdapterEndpointA: Token6022BridgeAdapter
+    let _layerZeroOFTAdapterEndpointB: Token6022BridgeAdapter
 
     let _mockEndpointV2A: Contract
     let _mockEndpointV2B: Contract
+    let _ccipRouter: Contract
 
     before(async function () {
         Token6022 = (await ethers.getContractFactory('Token6022')) as unknown as Token6022__factory
         LayerZeroOFTAdapter = (await ethers.getContractFactory(
-            'Token6022OFTAdapter'
-        )) as unknown as Token6022OFTAdapter__factory
+            'Token6022BridgeAdapter'
+        )) as unknown as Token6022BridgeAdapter__factory
 
         // Fetching the first three signers (accounts) from Hardhat's local Ethereum network
         const signers = await ethers.getSigners()
@@ -58,6 +59,8 @@ describe('WhenSendingTokenToAnotherEndpoint', function () {
         // Deploying a mock LZEndpoint with the given Endpoint ID
         _mockEndpointV2A = await EndpointV2Mock.deploy(eidA)
         _mockEndpointV2B = await EndpointV2Mock.deploy(eidB)
+        const ccipRouterFactory = await ethers.getContractFactory('CCIPRouterMock')
+        _ccipRouter = await ccipRouterFactory.deploy(16015286601757825753n)
 
         _token6022EndpointA = await Token6022.deploy(_ownerA.address, ethers.utils.parseEther('100'))
         _token6022EndpointB = await Token6022.deploy(_ownerB.address, ethers.utils.parseEther('100'))
@@ -66,11 +69,13 @@ describe('WhenSendingTokenToAnotherEndpoint', function () {
         _layerZeroOFTAdapterEndpointA = await LayerZeroOFTAdapter.deploy(
             _token6022EndpointA.address,
             _mockEndpointV2A.address,
+            _ccipRouter.address,
             _ownerA.address
         )
         _layerZeroOFTAdapterEndpointB = await LayerZeroOFTAdapter.deploy(
             _token6022EndpointB.address,
             _mockEndpointV2B.address,
+            _ccipRouter.address,
             _ownerB.address
         )
 
