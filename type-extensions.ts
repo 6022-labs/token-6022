@@ -1,27 +1,43 @@
 import 'hardhat/types/config'
 
-interface OftAdapterConfig {
-    tokenAddress: string
+interface BridgeCoreConfig {
+    type: 'canonical' | 'satellite'
+    tokenAddress?: string
+    tokenName?: string
+    tokenSymbol?: string
+}
+
+interface BridgeAdaptersConfig {
+    lz?: {
+        endpoint?: string
+    }
+    ccip?: {
+        router?: string
+    }
 }
 
 declare module 'hardhat/types/config' {
     interface HardhatNetworkUserConfig {
-        oftAdapter?: never
-        ccipRouter?: never
+        ccipChainSelector?: never
+        bridgeCore?: never
+        bridgeAdapters?: never
     }
 
     interface HardhatNetworkConfig {
-        oftAdapter?: never
-        ccipRouter?: never
+        ccipChainSelector?: never
+        bridgeCore?: never
+        bridgeAdapters?: never
     }
 
     interface HttpNetworkUserConfig {
-        oftAdapter?: OftAdapterConfig
-        ccipRouter?: string
+        ccipChainSelector?: string | bigint
+        bridgeCore?: BridgeCoreConfig
+        bridgeAdapters?: BridgeAdaptersConfig
     }
 
     interface HttpNetworkConfig {
-        oftAdapter?: OftAdapterConfig
-        ccipRouter?: string
+        ccipChainSelector?: string | bigint
+        bridgeCore?: BridgeCoreConfig
+        bridgeAdapters?: BridgeAdaptersConfig
     }
 }

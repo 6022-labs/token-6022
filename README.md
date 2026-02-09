@@ -1,23 +1,23 @@
 # 6022 Token Contracts
 
-This repository contains the 6022 token contracts, deployment scripts, and tests. It uses Hardhat + `hardhat-deploy` and supports bridging through both LayerZero V2 and Chainlink CCIP.
+This repository contains the 6022 token contracts, deployment scripts, and tests. It uses Hardhat + `hardhat-deploy` with a protocol-neutral bridge core and optional LayerZero / CCIP adapters.
 
 ## Architecture
 
-- Canonical chain (Polygon Amoy): `Token6022` + `Token6022BridgeAdapter`.
-  - Bridge-out: lock on adapter.
-  - Bridge-in: unlock from adapter.
-- Satellite chains: `Token6022BridgeToken`.
-  - Bridge-out: burn.
-  - Bridge-in: mint.
+- `Token6022BridgeCoreCanonical`: protocol-neutral lock/release core for canonical chain liquidity.
+- `Token6022BridgeCoreSatellite`: protocol-neutral mint/burn ERC20 core for satellite chains.
+- `Token6022BridgeAdapterLZ`: optional LayerZero transport adapter wired to one core.
+- `Token6022BridgeAdapterCCIP`: optional Chainlink CCIP transport adapter wired to one core.
 
-This keeps a fixed global supply model: canonical liquidity is locked/unlocked, satellites are mint/burn representations.
+With this split, core deployment is protocol-agnostic, and each transport can be deployed/wired independently.
 
 ## Contracts
 
 - `contracts/Token6022.sol`: canonical ERC20 token (`6022`) with initial supply mint.
-- `contracts/Token6022BridgeAdapter.sol`: canonical lock/unlock bridge endpoint for LayerZero + CCIP.
-- `contracts/Token6022BridgeToken.sol`: satellite mint/burn bridge endpoint for LayerZero + CCIP.
+- `contracts/Token6022BridgeCoreCanonical.sol`: canonical protocol-neutral core.
+- `contracts/Token6022BridgeCoreSatellite.sol`: satellite protocol-neutral core token.
+- `contracts/adapters/Token6022BridgeAdapterLZ.sol`: optional LayerZero transport adapter.
+- `contracts/adapters/Token6022BridgeAdapterCCIP.sol`: optional CCIP transport adapter.
 
 ## Setup
 
@@ -33,34 +33,102 @@ pnpm install
 PRIVATE_KEY=0xabc...def
 RPC_URL_AMOY_TESTNET=
 RPC_URL_BASE_TESTNET=
+
 CCIP_ROUTER_AMOY_TESTNET=
 CCIP_ROUTER_BASE_TESTNET=
+
+# https://docs.chain.link/cre/reference/sdk/evm-client-ts
+CCIP_CHAIN_SELECTOR_AMOY_TESTNET=16281711391670634445
+CCIP_CHAIN_SELECTOR_BASE_TESTNET=10344971235874465080
 ```
 
 3. Review `hardhat.config.ts`:
-- `oftAdapter.tokenAddress` must exist only on canonical networks.
-- `ccipRouter` must be set on every network where dual-bridge contracts are deployed.
+
+- `bridgeCore.type` controls whether a network deploys canonical or satellite core.
+- `bridgeCore.tokenAddress` is required for canonical core.
+- `bridgeAdapters.lz` controls optional LZ adapter deployment.
+- `bridgeAdapters.ccip.router` controls optional CCIP adapter deployment.
 
 ## Bridge Configuration
 
-### LayerZero
-
-- Topology is configured in `layerzero.testnet.config.ts`.
-- Deploy with:
+### 1) Deploy core (protocol-neutral)
 
 ```bash
-npx hardhat lz:deploy --tags Token6022BridgeToken,Token6022BridgeAdapter
+npx hardhat deploy --network amoy-testnet --tags Token6022BridgeCoreCanonical
+npx hardhat deploy --network base-testnet --tags Token6022BridgeCoreSatellite
 ```
 
-### CCIP
+### 2) Deploy adapters (optional, per transport)
 
-- There is no separate mesh config file like LayerZero's graph config.
-- CCIP connectivity is configured on-chain by owner calls:
+```bash
+npx hardhat deploy --network amoy-testnet --tags Token6022BridgeAdapterLZ
+npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterLZ
+
+npx hardhat deploy --network amoy-testnet --tags Token6022BridgeAdapterCCIP
+npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
+```
+
+Adapter deploy scripts automatically authorize the deployed adapter on the local core via `setAdapter(adapter, true)`.
+
+### 3) Wire LayerZero (optional)
+
+- Topology is configured in `layerzero.testnet.config.ts`.
+- Apply wiring per source network:
+
+```bash
+npx hardhat lz:wire --network amoy-testnet --lz-config layerzero.testnet.config.ts
+npx hardhat lz:wire --network base-testnet --lz-config layerzero.testnet.config.ts
+```
+
+### 4) Wire CCIP (optional)
+
+- Topology is configured in `ccip.testnet.config.ts`.
+- Apply CCIP wiring from that config on each source network:
+
+```bash
+npx hardhat ccip:wire --network amoy-testnet --ccip-config ccip.testnet.config.ts
+npx hardhat ccip:wire --network base-testnet --ccip-config ccip.testnet.config.ts
+```
+
+- Dry-run mode:
+
+```bash
+npx hardhat ccip:wire --network amoy-testnet --ccip-config ccip.testnet.config.ts --dry-run
+```
+
+- Under the hood this writes:
   - `setCcipPeer(uint64 chainSelector, address peer)`
-  - `setCcipExtraArgs(uint64 chainSelector, bytes extraArgs)` (optional)
+  - `setCcipExtraArgs(uint64 chainSelector, bytes extraArgs)` (when configured)
 - Sending uses:
-  - `sendWithCcip(...)` on `Token6022BridgeAdapter` (lock/unlock path)
-  - `sendWithCcip(...)` on `Token6022BridgeToken` (mint/burn path)
+  - `sendWithLz(...)` on `Token6022BridgeAdapterLZ`
+  - `sendWithCcip(...)` on `Token6022BridgeAdapterCCIP`
+
+### 5) Send bridge transfers (optional)
+
+LayerZero:
+
+```bash
+npx hardhat lz:send \
+  --network amoy-testnet \
+  --dst-eid 40245 \
+  --to 0xYourRecipient \
+  --amount 1
+```
+
+CCIP:
+
+```bash
+npx hardhat ccip:send \
+  --network amoy-testnet \
+  --dst-chain-selector 10344971235874465080 \
+  --to 0xYourRecipient \
+  --amount 1
+```
+
+Notes:
+- Both tasks auto-generate a `transferId` unless you pass `--transfer-id`.
+- Both tasks auto-approve canonical token allowance to `Token6022BridgeCoreCanonical` if needed.
+- `lz:send` uses `--options 0x` by default, which falls back to stored `lzSendOptions`.
 
 ## Build and Test
 
@@ -69,4 +137,4 @@ npx hardhat compile
 npx hardhat test
 ```
 
-Tests cover ERC20 behaviour, LayerZero OFT paths, and CCIP lock/unlock + mint/burn paths.
+Current tests cover ERC20 behavior and bridge flows for canonical/satellite cores and both adapters.
