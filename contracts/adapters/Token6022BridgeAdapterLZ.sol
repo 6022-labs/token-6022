@@ -39,7 +39,7 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
     /// @param _dstEid LayerZero destination endpoint id.
     /// @param _to Recipient on destination chain.
     /// @param _amount Token amount to bridge.
-    /// @param _transferId Cross-chain transfer identifier.
+    /// @param _userTransferId User-provided transfer identifier entropy.
     /// @param _options LayerZero execution options; empty uses stored defaults.
     /// @param _payInLzToken True to quote in LZ token, false for native fee.
     /// @return fee LayerZero fee quote.
@@ -47,11 +47,12 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
         uint32 _dstEid,
         address _to,
         uint256 _amount,
-        bytes32 _transferId,
+        bytes32 _userTransferId,
         bytes calldata _options,
         bool _payInLzToken
     ) external view returns (MessagingFee memory fee) {
-        bytes memory payload = abi.encode(_transferId, _to, _amount);
+        bytes32 transferId = _deriveTransferId(msg.sender, _dstEid, _to, _amount, _userTransferId);
+        bytes memory payload = abi.encode(transferId, _to, _amount);
         bytes memory options = _resolveOptions(_dstEid, _options);
 
         fee = _quote(_dstEid, payload, options, _payInLzToken);
@@ -61,23 +62,25 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
     /// @param _dstEid LayerZero destination endpoint id.
     /// @param _to Recipient on destination chain.
     /// @param _amount Token amount to bridge.
-    /// @param _transferId Cross-chain transfer identifier.
+    /// @param _userTransferId User-provided transfer identifier entropy.
     /// @param _options LayerZero execution options; empty uses stored defaults.
     /// @return receipt LayerZero messaging receipt.
     function sendWithLz(
         uint32 _dstEid,
         address _to,
         uint256 _amount,
-        bytes32 _transferId,
+        bytes32 _userTransferId,
         bytes calldata _options
     ) external payable returns (MessagingReceipt memory receipt) {
         if (_to == address(0)) {
             revert InvalidRecipient(_to);
         }
 
-        core.bridgeOut(msg.sender, _amount, _transferId);
+        bytes32 transferId = _deriveTransferId(msg.sender, _dstEid, _to, _amount, _userTransferId);
 
-        bytes memory payload = abi.encode(_transferId, _to, _amount);
+        core.bridgeOut(msg.sender, _amount, transferId);
+
+        bytes memory payload = abi.encode(transferId, _to, _amount);
         bytes memory options = _resolveOptions(_dstEid, _options);
 
         MessagingFee memory quoted = _quote(_dstEid, payload, options, false);
@@ -87,7 +90,7 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
 
         receipt = _lzSend(_dstEid, payload, options, MessagingFee(msg.value, 0), payable(msg.sender));
 
-        emit LzSend(_dstEid, receipt.guid, _transferId, msg.sender, _to, _amount);
+        emit LzSend(_dstEid, receipt.guid, transferId, msg.sender, _to, _amount);
     }
 
     /// @notice Handles inbound LayerZero payload and forwards it to core bridge logic.
@@ -118,5 +121,17 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
         } else {
             options = _options;
         }
+    }
+
+    /// @notice Derives a collision-resistant transfer identifier from caller and route metadata.
+    /// @dev User-provided transfer id is treated as entropy and namespaced by sender + destination + payload.
+    function _deriveTransferId(
+        address _sender,
+        uint32 _dstEid,
+        address _to,
+        uint256 _amount,
+        bytes32 _userTransferId
+    ) internal pure returns (bytes32 transferId) {
+        transferId = keccak256(abi.encode(_sender, _dstEid, _to, _amount, _userTransferId));
     }
 }

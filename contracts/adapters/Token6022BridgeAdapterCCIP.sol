@@ -48,28 +48,32 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
     /// @param _dstChainSelector Destination CCIP chain selector.
     /// @param _to Recipient on destination chain.
     /// @param _amount Token amount to bridge.
-    /// @param _transferId Cross-chain transfer identifier.
+    /// @param _userTransferId User-provided transfer identifier entropy.
     /// @return fee Required native fee.
     function quoteCcipSend(
         uint64 _dstChainSelector,
         address _to,
         uint256 _amount,
-        bytes32 _transferId
+        bytes32 _userTransferId
     ) external view returns (uint256 fee) {
-        return IRouterClient(getRouter()).getFee(_dstChainSelector, _buildCcipMessage(_dstChainSelector, _to, _amount, _transferId));
+        bytes32 transferId = _deriveTransferId(msg.sender, _dstChainSelector, _to, _amount, _userTransferId);
+
+        return IRouterClient(getRouter()).getFee(
+            _dstChainSelector, _buildCcipMessage(_dstChainSelector, _to, _amount, transferId)
+        );
     }
 
     /// @notice Bridges tokens through CCIP to the configured remote peer.
     /// @param _dstChainSelector Destination CCIP chain selector.
     /// @param _to Recipient on destination chain.
     /// @param _amount Token amount to bridge.
-    /// @param _transferId Cross-chain transfer identifier.
+    /// @param _userTransferId User-provided transfer identifier entropy.
     /// @return messageId CCIP message identifier.
     function sendWithCcip(
         uint64 _dstChainSelector,
         address _to,
         uint256 _amount,
-        bytes32 _transferId
+        bytes32 _userTransferId
     ) external payable returns (bytes32 messageId) {
         if (_to == address(0)) {
             revert InvalidRecipient(_to);
@@ -79,9 +83,11 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
             revert MissingCcipPeer(_dstChainSelector);
         }
 
-        core.bridgeOut(msg.sender, _amount, _transferId);
+        bytes32 transferId = _deriveTransferId(msg.sender, _dstChainSelector, _to, _amount, _userTransferId);
 
-        Client.EVM2AnyMessage memory message = _buildCcipMessage(_dstChainSelector, _to, _amount, _transferId);
+        core.bridgeOut(msg.sender, _amount, transferId);
+
+        Client.EVM2AnyMessage memory message = _buildCcipMessage(_dstChainSelector, _to, _amount, transferId);
 
         uint256 fee = IRouterClient(getRouter()).getFee(_dstChainSelector, message);
         if (msg.value < fee) {
@@ -90,7 +96,7 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
 
         messageId = IRouterClient(getRouter()).ccipSend{ value: msg.value }(_dstChainSelector, message);
 
-        emit CcipSend(_dstChainSelector, messageId, _transferId, msg.sender, _to, _amount);
+        emit CcipSend(_dstChainSelector, messageId, transferId, msg.sender, _to, _amount);
     }
 
     /// @notice Handles inbound CCIP messages and forwards payload to core bridge logic.
@@ -129,5 +135,17 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
             feeToken: address(0),
             extraArgs: ccipExtraArgs[_dstChainSelector]
         });
+    }
+
+    /// @notice Derives a collision-resistant transfer identifier from caller and route metadata.
+    /// @dev User-provided transfer id is treated as entropy and namespaced by sender + destination + payload.
+    function _deriveTransferId(
+        address _sender,
+        uint64 _dstChainSelector,
+        address _to,
+        uint256 _amount,
+        bytes32 _userTransferId
+    ) internal pure returns (bytes32 transferId) {
+        transferId = keccak256(abi.encode(_sender, _dstChainSelector, _to, _amount, _userTransferId));
     }
 }

@@ -164,10 +164,11 @@ describe("When validating inbound messages in Token6022BridgeAdapterLZ", functio
         event.event === "LzSend",
     );
     const guid = sendEvent?.args?.guid;
+    const derivedTransferId = sendEvent?.args?.transferId;
 
     const payload = ethers.utils.defaultAbiCoder.encode(
       ["bytes32", "address", "uint256"],
-      [transferId, ownerB.address, amount],
+      [derivedTransferId, ownerB.address, amount],
     );
     const payloadHash = ethers.utils.keccak256(payload);
 
@@ -217,16 +218,23 @@ describe("When validating inbound messages in Token6022BridgeAdapterLZ", functio
       options,
       false,
     );
-    await adapterA
+    const tx = await adapterA
       .connect(ownerA)
       .sendWithLz(eidB, ownerB.address, amount, transferId, options, {
         value: quote.nativeFee ?? quote[0],
       });
+    const receipt = await tx.wait();
+    const sendEvent = receipt.events?.find(
+      (event: any) =>
+        event.address.toLowerCase() === adapterA.address.toLowerCase() &&
+        event.event === "LzSend",
+    );
+    const derivedTransferId = sendEvent?.args?.transferId;
 
     const replayGuid = ethers.utils.hexlify(ethers.utils.randomBytes(32));
     const payload = ethers.utils.defaultAbiCoder.encode(
       ["bytes32", "address", "uint256"],
-      [transferId, ownerB.address, amount],
+      [derivedTransferId, ownerB.address, amount],
     );
     const payloadHash = ethers.utils.keccak256(payload);
 
@@ -247,7 +255,9 @@ describe("When validating inbound messages in Token6022BridgeAdapterLZ", functio
     );
 
     expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
-    expect(await satelliteCore.inboundTransfers(transferId)).to.equal(true);
+    expect(await satelliteCore.inboundTransfers(derivedTransferId)).to.equal(
+      true,
+    );
     expect(await satelliteCore.inboundTransportIds(replayGuid)).to.equal(false);
   });
 });

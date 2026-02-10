@@ -137,10 +137,11 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
         event.event === "CcipSend",
     );
     const messageId = sendEvent?.args?.messageId;
+    const derivedTransferId = sendEvent?.args?.transferId;
 
     const data = ethers.utils.defaultAbiCoder.encode(
       ["bytes32", "address", "uint256"],
-      [transferId, ownerB.address, amount],
+      [derivedTransferId, ownerB.address, amount],
     );
 
     await expect(
@@ -175,15 +176,22 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
     const amount = ethers.utils.parseEther("1");
 
     await canonicalToken.connect(ownerA).approve(canonicalCore.address, amount);
-    await adapterA
+    const tx = await adapterA
       .connect(ownerA)
       .sendWithCcip(destinationSelector, ownerB.address, amount, transferId, {
         value: 1,
       });
+    const receipt = await tx.wait();
+    const sendEvent = receipt.events?.find(
+      (event: any) =>
+        event.address.toLowerCase() === adapterA.address.toLowerCase() &&
+        event.event === "CcipSend",
+    );
+    const derivedTransferId = sendEvent?.args?.transferId;
 
     const data = ethers.utils.defaultAbiCoder.encode(
       ["bytes32", "address", "uint256"],
-      [transferId, ownerB.address, amount],
+      [derivedTransferId, ownerB.address, amount],
     );
 
     await expect(
@@ -199,6 +207,6 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
       }),
     )
       .to.be.revertedWithCustomError(satelliteCore, "TransferReplay")
-      .withArgs(transferId);
+      .withArgs(derivedTransferId);
   });
 });

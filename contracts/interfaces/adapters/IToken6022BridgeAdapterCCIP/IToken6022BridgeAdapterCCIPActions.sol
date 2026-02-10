@@ -6,25 +6,25 @@ interface IToken6022BridgeAdapterCCIPActions {
     /// @param dstChainSelector Destination CCIP chain selector.
     /// @param to Recipient on destination chain.
     /// @param amount Token amount to bridge.
-    /// @param transferId Cross-chain transfer identifier.
+    /// @param userTransferId User-provided transfer identifier entropy.
     /// @return fee Required native fee.
     function quoteCcipSend(
         uint64 dstChainSelector,
         address to,
         uint256 amount,
-        bytes32 transferId
+        bytes32 userTransferId
     ) external view returns (uint256 fee);
 
     /// @notice Bridges tokens through CCIP to the configured remote peer.
     /// @param dstChainSelector Destination CCIP chain selector.
     /// @param to Recipient on destination chain.
     /// @param amount Token amount to bridge.
-    /// @param transferId Cross-chain transfer identifier.
+    /// @param userTransferId User-provided transfer identifier entropy.
     /// @return messageId CCIP message identifier.
     function sendWithCcip(
         uint64 dstChainSelector,
         address to,
         uint256 amount,
-        bytes32 transferId
+        bytes32 userTransferId
     ) external payable returns (bytes32 messageId);
 }

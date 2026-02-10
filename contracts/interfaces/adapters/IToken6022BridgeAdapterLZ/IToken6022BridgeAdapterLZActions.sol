@@ -11,7 +11,7 @@ interface IToken6022BridgeAdapterLZActions {
     /// @param dstEid LayerZero destination endpoint id.
     /// @param to Recipient on destination chain.
     /// @param amount Token amount to bridge.
-    /// @param transferId Cross-chain transfer identifier.
+    /// @param userTransferId User-provided transfer identifier entropy.
     /// @param options LayerZero execution options; empty uses stored defaults.
     /// @param payInLzToken True to quote in LZ token, false for native fee.
     /// @return fee LayerZero fee quote.
@@ -19,7 +19,7 @@ interface IToken6022BridgeAdapterLZActions {
         uint32 dstEid,
         address to,
         uint256 amount,
-        bytes32 transferId,
+        bytes32 userTransferId,
         bytes calldata options,
         bool payInLzToken
     ) external view returns (MessagingFee memory fee);
@@ -28,14 +28,14 @@ interface IToken6022BridgeAdapterLZActions {
     /// @param dstEid LayerZero destination endpoint id.
     /// @param to Recipient on destination chain.
     /// @param amount Token amount to bridge.
-    /// @param transferId Cross-chain transfer identifier.
+    /// @param userTransferId User-provided transfer identifier entropy.
     /// @param options LayerZero execution options; empty uses stored defaults.
     /// @return receipt LayerZero messaging receipt.
     function sendWithLz(
         uint32 dstEid,
         address to,
         uint256 amount,
-        bytes32 transferId,
+        bytes32 userTransferId,
         bytes calldata options
     ) external payable returns (MessagingReceipt memory receipt);
 }

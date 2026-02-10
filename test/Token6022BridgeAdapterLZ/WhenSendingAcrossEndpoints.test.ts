@@ -9,7 +9,7 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
   const eidB = 2;
 
   async function deployFixture() {
-    const [ownerA, ownerB, endpointOwner] = await ethers.getSigners();
+    const [ownerA, ownerB, attacker, endpointOwner] = await ethers.getSigners();
 
     const endpointArtifact = await deployments.getArtifact("EndpointV2Mock");
     const endpointFactory = new ContractFactory(
@@ -78,6 +78,7 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
     return {
       ownerA,
       ownerB,
+      attacker,
       canonicalToken,
       canonicalCore,
       satelliteCore,
@@ -97,6 +98,21 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
 
   function getNativeFee(quote: any) {
     return quote.nativeFee ?? quote[0];
+  }
+
+  function deriveTransferId(
+    sender: string,
+    dstEid: number,
+    to: string,
+    amount: any,
+    userTransferId: string,
+  ) {
+    return ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        ["address", "uint32", "address", "uint256", "bytes32"],
+        [sender, dstEid, to, amount, userTransferId],
+      ),
+    );
   }
 
   it("Should bridge from canonical to satellite", async function () {
@@ -268,7 +284,16 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
       ethers.utils.parseEther("100"),
     );
     expect(await canonicalToken.balanceOf(canonicalCore.address)).to.equal(0);
-    expect(await canonicalCore.outboundTransfers(transferId)).to.equal(false);
+    const derivedTransferId = deriveTransferId(
+      ownerA.address,
+      eidB,
+      ethers.constants.AddressZero,
+      amount,
+      transferId,
+    );
+    expect(await canonicalCore.outboundTransfers(derivedTransferId)).to.equal(
+      false,
+    );
   });
 
   it("Should revert when provided native fee is too low", async function () {
@@ -288,5 +313,77 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
           value: 0,
         }),
     ).to.be.revertedWithCustomError(adapterA, "InvalidNativeFee");
+  });
+
+  it("Should allow two senders to reuse the same user transfer id", async function () {
+    const {
+      ownerA,
+      ownerB,
+      attacker,
+      canonicalToken,
+      canonicalCore,
+      satelliteCore,
+      adapterA,
+    } = await loadFixture(deployFixture);
+
+    const amount = ethers.utils.parseEther("1");
+    const userTransferId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+    const options = getOptions();
+
+    await canonicalToken.connect(ownerA).transfer(attacker.address, amount);
+    await canonicalToken.connect(ownerA).approve(canonicalCore.address, amount);
+    await canonicalToken
+      .connect(attacker)
+      .approve(canonicalCore.address, amount);
+
+    const ownerQuote = await adapterA.quoteLzSend(
+      eidB,
+      ownerB.address,
+      amount,
+      userTransferId,
+      options,
+      false,
+    );
+    await adapterA
+      .connect(ownerA)
+      .sendWithLz(eidB, ownerB.address, amount, userTransferId, options, {
+        value: getNativeFee(ownerQuote),
+      });
+
+    const attackerQuote = await adapterA.connect(attacker).quoteLzSend(
+      eidB,
+      ownerB.address,
+      amount,
+      userTransferId,
+      options,
+      false,
+    );
+    await adapterA
+      .connect(attacker)
+      .sendWithLz(eidB, ownerB.address, amount, userTransferId, options, {
+        value: getNativeFee(attackerQuote),
+      });
+
+    const ownerTransferId = deriveTransferId(
+      ownerA.address,
+      eidB,
+      ownerB.address,
+      amount,
+      userTransferId,
+    );
+    const attackerTransferId = deriveTransferId(
+      attacker.address,
+      eidB,
+      ownerB.address,
+      amount,
+      userTransferId,
+    );
+
+    expect(ownerTransferId).to.not.equal(attackerTransferId);
+    expect(await canonicalCore.outboundTransfers(ownerTransferId)).to.equal(true);
+    expect(await canonicalCore.outboundTransfers(attackerTransferId)).to.equal(
+      true,
+    );
+    expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount.mul(2));
   });
 });

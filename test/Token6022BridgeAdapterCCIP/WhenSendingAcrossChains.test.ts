@@ -8,7 +8,7 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
   const destinationSelector = 14767482510784806043n;
 
   async function deployFixture() {
-    const [ownerA, ownerB] = await ethers.getSigners();
+    const [ownerA, ownerB, attacker] = await ethers.getSigners();
 
     const tokenFactory = await ethers.getContractFactory("Token6022");
     const canonicalToken = (await tokenFactory.deploy(
@@ -71,6 +71,7 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
     return {
       ownerA,
       ownerB,
+      attacker,
       canonicalToken,
       canonicalCore,
       satelliteCore,
@@ -78,6 +79,21 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
       adapterA,
       adapterB,
     };
+  }
+
+  function deriveTransferId(
+    sender: string,
+    dstChainSelector: bigint,
+    to: string,
+    amount: any,
+    userTransferId: string,
+  ) {
+    return ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        ["address", "uint64", "address", "uint256", "bytes32"],
+        [sender, dstChainSelector, to, amount, userTransferId],
+      ),
+    );
   }
 
   it("Should quote and bridge from canonical to satellite", async function () {
@@ -118,7 +134,16 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
       amount,
     );
     expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
-    expect(await canonicalCore.outboundTransfers(transferId)).to.equal(true);
+    const derivedTransferId = deriveTransferId(
+      ownerA.address,
+      destinationSelector,
+      ownerB.address,
+      amount,
+      transferId,
+    );
+    expect(await canonicalCore.outboundTransfers(derivedTransferId)).to.equal(
+      true,
+    );
   });
 
   it("Should bridge back from satellite to canonical", async function () {
@@ -201,7 +226,70 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
       ethers.utils.parseEther("100"),
     );
     expect(await canonicalToken.balanceOf(canonicalCore.address)).to.equal(0);
-    expect(await canonicalCore.outboundTransfers(transferId)).to.equal(false);
+    const derivedTransferId = deriveTransferId(
+      ownerA.address,
+      destinationSelector,
+      ethers.constants.AddressZero,
+      amount,
+      transferId,
+    );
+    expect(await canonicalCore.outboundTransfers(derivedTransferId)).to.equal(
+      false,
+    );
+  });
+
+  it("Should allow two senders to reuse the same user transfer id", async function () {
+    const {
+      ownerA,
+      ownerB,
+      attacker,
+      canonicalToken,
+      canonicalCore,
+      satelliteCore,
+      adapterA,
+    } = await loadFixture(deployFixture);
+
+    const amount = ethers.utils.parseEther("1");
+    const userTransferId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+
+    await canonicalToken.connect(ownerA).transfer(attacker.address, amount);
+    await canonicalToken.connect(ownerA).approve(canonicalCore.address, amount);
+    await canonicalToken
+      .connect(attacker)
+      .approve(canonicalCore.address, amount);
+
+    await adapterA
+      .connect(ownerA)
+      .sendWithCcip(destinationSelector, ownerB.address, amount, userTransferId, {
+        value: 1,
+      });
+    await adapterA
+      .connect(attacker)
+      .sendWithCcip(destinationSelector, ownerB.address, amount, userTransferId, {
+        value: 1,
+      });
+
+    const ownerTransferId = deriveTransferId(
+      ownerA.address,
+      destinationSelector,
+      ownerB.address,
+      amount,
+      userTransferId,
+    );
+    const attackerTransferId = deriveTransferId(
+      attacker.address,
+      destinationSelector,
+      ownerB.address,
+      amount,
+      userTransferId,
+    );
+
+    expect(ownerTransferId).to.not.equal(attackerTransferId);
+    expect(await canonicalCore.outboundTransfers(ownerTransferId)).to.equal(true);
+    expect(await canonicalCore.outboundTransfers(attackerTransferId)).to.equal(
+      true,
+    );
+    expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount.mul(2));
   });
 
   it("Should revert when peer is missing", async function () {
