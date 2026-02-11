@@ -13,8 +13,8 @@ interface IToken6022BridgeAdapterCCIPErrors {
 
     /// @notice Thrown when an inbound message sender does not match configured peer.
     /// @param chainSelector Source CCIP chain selector.
-    /// @param sender Decoded CCIP sender from the message.
-    error InvalidCcipPeer(uint64 chainSelector, address sender);
+    /// @param sender Raw CCIP sender bytes from the message.
+    error InvalidCcipPeer(uint64 chainSelector, bytes sender);
 
     /// @notice Thrown when deploying with a zero core address.
     /// @param core Invalid core address.

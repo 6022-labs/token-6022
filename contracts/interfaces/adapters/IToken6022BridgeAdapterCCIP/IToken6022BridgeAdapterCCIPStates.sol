@@ -10,8 +10,8 @@ interface IToken6022BridgeAdapterCCIPStates {
 
     /// @notice Returns the trusted remote adapter for a CCIP chain selector.
     /// @param chainSelector CCIP chain selector.
-    /// @return peer Trusted remote adapter address.
-    function ccipPeers(uint64 chainSelector) external view returns (address peer);
+    /// @return peer Trusted remote adapter identifier bytes.
+    function ccipPeers(uint64 chainSelector) external view returns (bytes memory peer);
 
     /// @notice Returns CCIP extra arguments configured for destination chain selector.
     /// @param chainSelector CCIP chain selector.

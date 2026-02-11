@@ -18,9 +18,9 @@ interface CcipWireArgs {
 }
 
 const CCIP_CONFIGURABLE_ABI = [
-    'function ccipPeers(uint64 chainSelector) view returns (address peer)',
+    'function ccipPeers(uint64 chainSelector) view returns (bytes peer)',
     'function ccipExtraArgs(uint64 chainSelector) view returns (bytes extraArgs)',
-    'function setCcipPeer(uint64 chainSelector, address peer)',
+    'function setCcipPeer(uint64 chainSelector, bytes peer)',
     'function setCcipExtraArgs(uint64 chainSelector, bytes extraArgs)',
 ]
 
@@ -77,6 +77,10 @@ function normalizeHexBytes(value: string, hre: HardhatRuntimeEnvironment): strin
     return hre.ethers.utils.hexlify(value).toLowerCase()
 }
 
+function encodeEvmCcipPeer(address: string, hre: HardhatRuntimeEnvironment): string {
+    return hre.ethers.utils.defaultAbiCoder.encode(['address'], [hre.ethers.utils.getAddress(address)])
+}
+
 async function configureConnection(
     connection: CcipConnectionHardhat,
     hre: HardhatRuntimeEnvironment,
@@ -90,10 +94,10 @@ async function configureConnection(
         throw new Error(`Chain selector ${destinationChainSelector} exceeds uint64 range`)
     }
 
-    const remotePeer = await resolvePointAddress(connection.to, hre)
+    const remotePeer = encodeEvmCcipPeer(await resolvePointAddress(connection.to, hre), hre)
     const currentPeer = await contract.ccipPeers(destinationChainSelector)
 
-    if (currentPeer.toLowerCase() !== remotePeer.toLowerCase()) {
+    if (normalizeHexBytes(currentPeer, hre) !== normalizeHexBytes(remotePeer, hre)) {
         const action = `[ccip:wire] setCcipPeer selector=${destinationChainSelector} peer=${remotePeer}`
 
         if (dryRun) {

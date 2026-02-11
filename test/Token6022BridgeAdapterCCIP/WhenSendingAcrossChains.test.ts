@@ -53,18 +53,23 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
     await canonicalCore.connect(ownerA).setAdapter(adapterA.address, true);
     await satelliteCore.connect(ownerB).setAdapter(adapterB.address, true);
 
+    const peerAdapterA = ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      [adapterA.address],
+    );
+    const peerAdapterB = ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      [adapterB.address],
+    );
+
     await adapterA
       .connect(ownerA)
-      .setCcipPeer(destinationSelector, adapterB.address);
-    await adapterA
-      .connect(ownerA)
-      .setCcipPeer(sourceSelector, adapterB.address);
+      .setCcipPeer(destinationSelector, peerAdapterB);
+    await adapterA.connect(ownerA).setCcipPeer(sourceSelector, peerAdapterB);
+    await adapterB.connect(ownerB).setCcipPeer(sourceSelector, peerAdapterA);
     await adapterB
       .connect(ownerB)
-      .setCcipPeer(sourceSelector, adapterA.address);
-    await adapterB
-      .connect(ownerB)
-      .setCcipPeer(destinationSelector, adapterA.address);
+      .setCcipPeer(destinationSelector, peerAdapterA);
 
     return {
       ownerA,
@@ -264,14 +269,26 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
 
     await adapterA
       .connect(ownerA)
-      .sendWithCcip(destinationSelector, ownerB.address, amount, userTransferId, {
-        value: 1,
-      });
+      .sendWithCcip(
+        destinationSelector,
+        ownerB.address,
+        amount,
+        userTransferId,
+        {
+          value: 1,
+        },
+      );
     await adapterA
       .connect(attacker)
-      .sendWithCcip(destinationSelector, ownerB.address, amount, userTransferId, {
-        value: 1,
-      });
+      .sendWithCcip(
+        destinationSelector,
+        ownerB.address,
+        amount,
+        userTransferId,
+        {
+          value: 1,
+        },
+      );
 
     const ownerTransferId = deriveTransferId(
       adapterA.address,
@@ -291,11 +308,15 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
     );
 
     expect(ownerTransferId).to.not.equal(attackerTransferId);
-    expect(await canonicalCore.outboundTransfers(ownerTransferId)).to.equal(true);
+    expect(await canonicalCore.outboundTransfers(ownerTransferId)).to.equal(
+      true,
+    );
     expect(await canonicalCore.outboundTransfers(attackerTransferId)).to.equal(
       true,
     );
-    expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount.mul(2));
+    expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(
+      amount.mul(2),
+    );
   });
 
   it("Should revert when peer is missing", async function () {
@@ -364,8 +385,14 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
   });
 
   it("Should refund overpaid native fee", async function () {
-    const { ownerA, ownerB, canonicalToken, canonicalCore, satelliteCore, adapterA } =
-      await loadFixture(deployFixture);
+    const {
+      ownerA,
+      ownerB,
+      canonicalToken,
+      canonicalCore,
+      satelliteCore,
+      adapterA,
+    } = await loadFixture(deployFixture);
 
     const amount = ethers.utils.parseEther("1");
     const transferId = ethers.utils.hexlify(ethers.utils.randomBytes(32));

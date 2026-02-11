@@ -38,7 +38,9 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
     await router.setChainSupported(sourceSelector, true);
     await router.setChainSupported(destinationSelector, true);
 
-    const adapterFactory = await ethers.getContractFactory("Token6022BridgeAdapterCCIP");
+    const adapterFactory = await ethers.getContractFactory(
+      "Token6022BridgeAdapterCCIP",
+    );
     const adapterA = (await adapterFactory.deploy(
       canonicalCore.address,
       router.address,
@@ -51,18 +53,23 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
     await canonicalCore.connect(ownerA).setAdapter(adapterA.address, true);
     await satelliteCore.connect(ownerB).setAdapter(adapterB.address, true);
 
+    const peerAdapterA = ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      [adapterA.address],
+    );
+    const peerAdapterB = ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      [adapterB.address],
+    );
+
     await adapterA
       .connect(ownerA)
-      .setCcipPeer(destinationSelector, adapterB.address);
-    await adapterA
-      .connect(ownerA)
-      .setCcipPeer(sourceSelector, adapterB.address);
+      .setCcipPeer(destinationSelector, peerAdapterB);
+    await adapterA.connect(ownerA).setCcipPeer(sourceSelector, peerAdapterB);
+    await adapterB.connect(ownerB).setCcipPeer(sourceSelector, peerAdapterA);
     await adapterB
       .connect(ownerB)
-      .setCcipPeer(sourceSelector, adapterA.address);
-    await adapterB
-      .connect(ownerB)
-      .setCcipPeer(destinationSelector, adapterA.address);
+      .setCcipPeer(destinationSelector, peerAdapterA);
 
     return {
       ownerA,
@@ -89,6 +96,11 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
       [transferId, ownerB.address, amount],
     );
 
+    const encodeAttacker = ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      [attacker.address],
+    );
+
     await expect(
       router.route(adapterB.address, {
         messageId: ethers.utils.hexlify(ethers.utils.randomBytes(32)),
@@ -102,7 +114,39 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
       }),
     )
       .to.be.revertedWithCustomError(adapterB, "InvalidCcipPeer")
-      .withArgs(sourceSelector, attacker.address);
+      .withArgs(sourceSelector, encodeAttacker);
+  });
+
+  it("Should accept inbound message when peer is configured as non-EVM bytes", async function () {
+    const { ownerB, router, adapterB, satelliteCore } = await loadFixture(
+      deployFixture,
+    );
+
+    const transferId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+    const amount = ethers.utils.parseEther("2");
+    const nonEvmPeer = "0x11223344";
+    const messageId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+
+    await adapterB.connect(ownerB).setCcipPeer(sourceSelector, nonEvmPeer);
+
+    const data = ethers.utils.defaultAbiCoder.encode(
+      ["bytes32", "address", "uint256"],
+      [transferId, ownerB.address, amount],
+    );
+
+    await expect(
+      router.route(adapterB.address, {
+        messageId,
+        sourceChainSelector: sourceSelector,
+        sender: nonEvmPeer,
+        data,
+        destTokenAmounts: [],
+      }),
+    ).to.emit(adapterB, "CcipReceive");
+
+    expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
+    expect(await satelliteCore.inboundTransfers(transferId)).to.equal(true);
+    expect(await satelliteCore.inboundTransportIds(messageId)).to.equal(true);
   });
 
   it("Should reject transport replay using same CCIP message id", async function () {

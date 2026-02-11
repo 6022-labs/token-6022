@@ -318,20 +318,26 @@ async function assertCcipRouteMatchesConfig(
     matchedConnection.to as CcipPointHardhat,
     hre,
   );
-  const expectedPeer = hre.ethers.utils.getAddress(remoteAddress).toLowerCase();
+  const expectedPeer = hre.ethers.utils.defaultAbiCoder.encode(
+    ["address"],
+    [hre.ethers.utils.getAddress(remoteAddress)],
+  );
   const adapter = new Contract(
     adapterAddress,
-    ["function ccipPeers(uint64 chainSelector) view returns (address peer)"],
+    ["function ccipPeers(uint64 chainSelector) view returns (bytes peer)"],
     signer,
   );
   const currentPeer = hre.ethers.utils
-    .getAddress(await adapter.ccipPeers(normalizedDestinationSelector))
+    .hexlify(await adapter.ccipPeers(normalizedDestinationSelector))
+    .toLowerCase();
+  const normalizedExpectedPeer = hre.ethers.utils
+    .hexlify(expectedPeer)
     .toLowerCase();
 
-  if (currentPeer !== expectedPeer) {
+  if (currentPeer !== normalizedExpectedPeer) {
     throw new Error(
       `[ccip:send] peer mismatch for adapter=${adapterAddress} dstChainSelector=${normalizedDestinationSelector}. ` +
-        `expected=${expectedPeer} configured=${currentPeer}. ` +
+        `expected=${normalizedExpectedPeer} configured=${currentPeer}. ` +
         `Run \"npx hardhat ccip:wire --network ${localNetwork} --ccip-config ${ccipConfigPath}\".`,
     );
   }

@@ -103,7 +103,7 @@ npx hardhat ccip:wire --network amoy-testnet --ccip-config ccip.testnet.config.t
 ```
 
 - Under the hood this writes:
-  - `setCcipPeer(uint64 chainSelector, address peer)`
+  - `setCcipPeer(uint64 chainSelector, bytes peer)` (EVM adapters use `abi.encode(address)`)
   - `setCcipExtraArgs(uint64 chainSelector, bytes extraArgs)` (when configured)
 - Sending uses:
   - `sendWithLz(...)` on `Token6022BridgeAdapterLZ`

@@ -4,8 +4,8 @@ pragma solidity ^0.8.22;
 interface IToken6022BridgeAdapterCCIPEvents {
     /// @notice Emitted when trusted CCIP peer is configured for a chain selector.
     /// @param chainSelector CCIP chain selector.
-    /// @param peer Trusted remote adapter address.
-    event CcipPeerSet(uint64 indexed chainSelector, address indexed peer);
+    /// @param peer Trusted remote adapter identifier bytes.
+    event CcipPeerSet(uint64 indexed chainSelector, bytes peer);
 
     /// @notice Emitted when CCIP extra arguments are configured for a chain selector.
     /// @param chainSelector CCIP chain selector.

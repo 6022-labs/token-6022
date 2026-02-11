@@ -37,39 +37,72 @@ describe("When managing admin access in Token6022BridgeAdapterCCIP", function ()
       router.address,
     )) as Contract;
 
-    return { owner, newOwner, canonicalCore, adapter };
+    const peerAdapter = (await adapterFactory.deploy(
+      canonicalCore.address,
+      router.address,
+    )) as Contract;
+    const nextPeerAdapter = (await adapterFactory.deploy(
+      canonicalCore.address,
+      router.address,
+    )) as Contract;
+
+    return {
+      owner,
+      newOwner,
+      canonicalCore,
+      adapter,
+      peerAdapter,
+      nextPeerAdapter,
+    };
   }
 
   it("Should gate peer and extraArgs configuration by current core owner", async function () {
-    const { owner, newOwner, canonicalCore, adapter } = await loadFixture(
-      deployFixture,
+    const {
+      owner,
+      newOwner,
+      canonicalCore,
+      adapter,
+      peerAdapter,
+      nextPeerAdapter,
+    } = await loadFixture(deployFixture);
+
+    const peer = ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      [peerAdapter.address],
     );
 
-    await expect(
-      adapter.connect(owner).setCcipPeer(destinationSelector, owner.address),
-    )
+    await expect(adapter.connect(owner).setCcipPeer(destinationSelector, peer))
       .to.emit(adapter, "CcipPeerSet")
-      .withArgs(destinationSelector, owner.address);
+      .withArgs(destinationSelector, peer);
 
     await canonicalCore.connect(owner).transferOwnership(newOwner.address);
 
+    const newPeer = ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      [nextPeerAdapter.address],
+    );
+
     await expect(
-      adapter.connect(owner).setCcipPeer(destinationSelector, newOwner.address),
+      adapter.connect(owner).setCcipPeer(destinationSelector, newPeer),
     )
       .to.be.revertedWithCustomError(adapter, "OnlyCoreOwner")
       .withArgs(owner.address, newOwner.address);
 
-    await expect(adapter.connect(owner).setCcipExtraArgs(destinationSelector, "0x01"))
+    await expect(
+      adapter.connect(owner).setCcipExtraArgs(destinationSelector, "0x01"),
+    )
       .to.be.revertedWithCustomError(adapter, "OnlyCoreOwner")
       .withArgs(owner.address, newOwner.address);
 
     await expect(
-      adapter.connect(newOwner).setCcipPeer(destinationSelector, newOwner.address),
+      adapter.connect(newOwner).setCcipPeer(destinationSelector, newPeer),
     )
       .to.emit(adapter, "CcipPeerSet")
-      .withArgs(destinationSelector, newOwner.address);
+      .withArgs(destinationSelector, newPeer);
 
-    await expect(adapter.connect(newOwner).setCcipExtraArgs(destinationSelector, "0x0102"))
+    await expect(
+      adapter.connect(newOwner).setCcipExtraArgs(destinationSelector, "0x0102"),
+    )
       .to.emit(adapter, "CcipExtraArgsSet")
       .withArgs(destinationSelector, "0x0102");
   });

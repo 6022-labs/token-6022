@@ -12,7 +12,7 @@ import { IToken6022BridgeAdapterCCIP } from "../interfaces/adapters/IToken6022Br
 contract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP {
     IToken6022BridgeCore public immutable core;
 
-    mapping(uint64 chainSelector => address peer) public ccipPeers;
+    mapping(uint64 chainSelector => bytes peer) public ccipPeers;
     mapping(uint64 chainSelector => bytes extraArgs) public ccipExtraArgs;
 
     modifier onlyCoreOwner() {
@@ -37,7 +37,7 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP
     /// @notice Sets the trusted remote CCIP adapter for a chain selector.
     /// @param _chainSelector CCIP chain selector.
     /// @param _peer Trusted remote adapter.
-    function setCcipPeer(uint64 _chainSelector, address _peer) external onlyCoreOwner {
+    function setCcipPeer(uint64 _chainSelector, bytes calldata _peer) external onlyCoreOwner {
         ccipPeers[_chainSelector] = _peer;
         emit CcipPeerSet(_chainSelector, _peer);
     }
@@ -85,7 +85,7 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP
             revert InvalidRecipient(_to);
         }
 
-        if (ccipPeers[_dstChainSelector] == address(0)) {
+        if (ccipPeers[_dstChainSelector].length == 0) {
             revert MissingCcipPeer(_dstChainSelector);
         }
 
@@ -116,10 +116,10 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP
     /// @notice Handles inbound CCIP messages and forwards payload to core bridge logic.
     /// @param _message Incoming CCIP message.
     function _ccipReceive(Client.Any2EVMMessage memory _message) internal override {
-        address sourceSender = abi.decode(_message.sender, (address));
-        address expectedPeer = ccipPeers[_message.sourceChainSelector];
+        bytes memory sourceSender = _message.sender;
+        bytes memory expectedPeer = ccipPeers[_message.sourceChainSelector];
 
-        if (sourceSender != expectedPeer) {
+        if (expectedPeer.length == 0 || keccak256(sourceSender) != keccak256(expectedPeer)) {
             revert InvalidCcipPeer(_message.sourceChainSelector, sourceSender);
         }
 
@@ -143,7 +143,7 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP
         bytes32 _transferId
     ) internal view returns (Client.EVM2AnyMessage memory message) {
         message = Client.EVM2AnyMessage({
-            receiver: abi.encode(ccipPeers[_dstChainSelector]),
+            receiver: ccipPeers[_dstChainSelector],
             data: abi.encode(_transferId, _to, _amount),
             tokenAmounts: new Client.EVMTokenAmount[](0),
             feeToken: address(0),
