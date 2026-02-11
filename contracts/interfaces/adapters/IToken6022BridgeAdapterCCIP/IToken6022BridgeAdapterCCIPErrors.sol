@@ -23,4 +23,9 @@ interface IToken6022BridgeAdapterCCIPErrors {
     /// @param supplied Native value provided by caller.
     /// @param required Required native fee.
     error InvalidNativeFee(uint256 supplied, uint256 required);
+
+    /// @notice Thrown when refunding excess native fee to caller fails.
+    /// @param recipient Refund recipient.
+    /// @param amount Refund amount.
+    error NativeRefundFailed(address recipient, uint256 amount);
 }

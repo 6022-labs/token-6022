@@ -360,4 +360,36 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
       .to.be.revertedWithCustomError(adapterA, "InvalidNativeFee")
       .withArgs(0, 1);
   });
+
+  it("Should refund overpaid native fee", async function () {
+    const { ownerA, ownerB, canonicalToken, canonicalCore, satelliteCore, adapterA } =
+      await loadFixture(deployFixture);
+
+    const amount = ethers.utils.parseEther("1");
+    const transferId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+    const fee = await adapterA.quoteCcipSend(
+      destinationSelector,
+      ownerB.address,
+      amount,
+      transferId,
+    );
+
+    await canonicalToken.connect(ownerA).approve(canonicalCore.address, amount);
+
+    const overpayment = fee.add(1);
+    const balanceBefore = await ethers.provider.getBalance(ownerA.address);
+    const tx = await adapterA
+      .connect(ownerA)
+      .sendWithCcip(destinationSelector, ownerB.address, amount, transferId, {
+        value: overpayment,
+      });
+    const receipt = await tx.wait();
+    const effectiveGasPrice =
+      receipt.effectiveGasPrice ?? tx.gasPrice ?? ethers.constants.Zero;
+    const gasCost = receipt.gasUsed.mul(effectiveGasPrice);
+    const balanceAfter = await ethers.provider.getBalance(ownerA.address);
+
+    expect(balanceBefore.sub(balanceAfter)).to.equal(gasCost.add(fee));
+    expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
+  });
 });

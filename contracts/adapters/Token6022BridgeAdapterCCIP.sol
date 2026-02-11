@@ -94,7 +94,15 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
             revert InvalidNativeFee(msg.value, fee);
         }
 
-        messageId = IRouterClient(getRouter()).ccipSend{ value: msg.value }(_dstChainSelector, message);
+        messageId = IRouterClient(getRouter()).ccipSend{ value: fee }(_dstChainSelector, message);
+
+        uint256 refund = msg.value - fee;
+        if (refund != 0) {
+            (bool success,) = payable(msg.sender).call{ value: refund }("");
+            if (!success) {
+                revert NativeRefundFailed(msg.sender, refund);
+            }
+        }
 
         emit CcipSend(_dstChainSelector, messageId, transferId, msg.sender, _to, _amount);
     }
