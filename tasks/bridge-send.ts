@@ -23,13 +23,11 @@ interface LzSendArgs extends BridgeSendCommonArgs {
   dstEid: number;
   options: string;
   lzConfig: string;
-  skipConfigCheck: boolean;
 }
 
 interface CcipSendArgs extends BridgeSendCommonArgs {
   dstChainSelector: string;
   ccipConfig: string;
-  skipConfigCheck: boolean;
 }
 
 interface MeshPoint {
@@ -385,10 +383,6 @@ task("lz:send", "Sends a bridge transfer through Token6022BridgeAdapterLZ")
     "layerzero.testnet.config.ts",
     types.string,
   )
-  .addFlag(
-    "skipConfigCheck",
-    "Skip route verification against mesh config and adapter peer state",
-  )
   .setAction(async (args: LzSendArgs, hre: HardhatRuntimeEnvironment) => {
     const signer = (await hre.ethers.getSigners())[0];
     if (signer == null) {
@@ -405,15 +399,13 @@ task("lz:send", "Sends a bridge transfer through Token6022BridgeAdapterLZ")
     const transferId = resolveTransferId(args.transferId, hre);
     await assertAdapterAuthorized(coreAddress, adapterAddress, signer);
 
-    if (!args.skipConfigCheck) {
-      await assertLzRouteMatchesConfig(
-        adapterAddress,
-        args.dstEid,
-        args.lzConfig,
-        hre,
-        signer,
-      );
-    }
+    await assertLzRouteMatchesConfig(
+      adapterAddress,
+      args.dstEid,
+      args.lzConfig,
+      hre,
+      signer,
+    );
 
     const { amountLD, decimals, canonicalToken } =
       await resolveAmountAndApproveIfNeeded(
@@ -497,10 +489,6 @@ task("ccip:send", "Sends a bridge transfer through Token6022BridgeAdapterCCIP")
     "ccip.testnet.config.ts",
     types.string,
   )
-  .addFlag(
-    "skipConfigCheck",
-    "Skip route verification against mesh config and adapter peer state",
-  )
   .setAction(async (args: CcipSendArgs, hre: HardhatRuntimeEnvironment) => {
     const signer = (await hre.ethers.getSigners())[0];
     if (signer == null) {
@@ -517,15 +505,13 @@ task("ccip:send", "Sends a bridge transfer through Token6022BridgeAdapterCCIP")
     const transferId = resolveTransferId(args.transferId, hre);
     await assertAdapterAuthorized(coreAddress, adapterAddress, signer);
 
-    if (!args.skipConfigCheck) {
-      await assertCcipRouteMatchesConfig(
-        adapterAddress,
-        args.dstChainSelector,
-        args.ccipConfig,
-        hre,
-        signer,
-      );
-    }
+    await assertCcipRouteMatchesConfig(
+      adapterAddress,
+      args.dstChainSelector,
+      args.ccipConfig,
+      hre,
+      signer,
+    );
 
     const { amountLD, decimals, canonicalToken } =
       await resolveAmountAndApproveIfNeeded(
