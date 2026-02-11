@@ -1,24 +1,9 @@
 import assert from "assert";
 
 import { type DeployFunction } from "hardhat-deploy/types";
+import { resolveBridgeCoreName } from "./utils/resolve-bridge-core";
 
 const contractName = "Token6022BridgeAdapterCCIP";
-
-async function resolveCoreName(
-  hre: Parameters<DeployFunction>[0],
-): Promise<string | null> {
-  const canonical = await hre.deployments.getOrNull("Token6022BridgeCoreCanonical");
-  if (canonical != null) {
-    return "Token6022BridgeCoreCanonical";
-  }
-
-  const satellite = await hre.deployments.getOrNull("Token6022BridgeCoreSatellite");
-  if (satellite != null) {
-    return "Token6022BridgeCoreSatellite";
-  }
-
-  return null;
-}
 
 const deploy: DeployFunction = async (hre) => {
   const { getNamedAccounts, deployments } = hre;
@@ -33,13 +18,7 @@ const deploy: DeployFunction = async (hre) => {
     return;
   }
 
-  const coreName = await resolveCoreName(hre);
-  if (coreName == null) {
-    console.warn(
-      `[${contractName}] no BridgeCore deployed on ${hre.network.name}, skipping deployment`,
-    );
-    return;
-  }
+  const coreName = await resolveBridgeCoreName(hre, contractName);
 
   const coreDeployment = await deployments.get(coreName);
 
