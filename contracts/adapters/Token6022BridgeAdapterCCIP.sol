@@ -146,14 +146,16 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
     }
 
     /// @notice Derives a collision-resistant transfer identifier from caller and route metadata.
-    /// @dev User-provided transfer id is treated as entropy and namespaced by sender + destination + payload.
+    /// @dev User-provided transfer id is treated as entropy and namespaced by adapter + sender + destination + payload.
     function _deriveTransferId(
         address _sender,
         uint64 _dstChainSelector,
         address _to,
         uint256 _amount,
         bytes32 _userTransferId
-    ) internal pure returns (bytes32 transferId) {
-        transferId = keccak256(abi.encode(_sender, _dstChainSelector, _to, _amount, _userTransferId));
+    ) internal view returns (bytes32 transferId) {
+        transferId = keccak256(
+            abi.encode(address(this), _sender, _dstChainSelector, _to, _amount, _userTransferId)
+        );
     }
 }

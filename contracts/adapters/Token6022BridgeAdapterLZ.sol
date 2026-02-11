@@ -124,14 +124,14 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
     }
 
     /// @notice Derives a collision-resistant transfer identifier from caller and route metadata.
-    /// @dev User-provided transfer id is treated as entropy and namespaced by sender + destination + payload.
+    /// @dev User-provided transfer id is treated as entropy and namespaced by adapter + sender + destination + payload.
     function _deriveTransferId(
         address _sender,
         uint32 _dstEid,
         address _to,
         uint256 _amount,
         bytes32 _userTransferId
-    ) internal pure returns (bytes32 transferId) {
-        transferId = keccak256(abi.encode(_sender, _dstEid, _to, _amount, _userTransferId));
+    ) internal view returns (bytes32 transferId) {
+        transferId = keccak256(abi.encode(address(this), _sender, _dstEid, _to, _amount, _userTransferId));
     }
 }

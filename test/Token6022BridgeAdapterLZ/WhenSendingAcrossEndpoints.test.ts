@@ -101,6 +101,7 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
   }
 
   function deriveTransferId(
+    adapter: string,
     sender: string,
     dstEid: number,
     to: string,
@@ -109,8 +110,8 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
   ) {
     return ethers.utils.keccak256(
       ethers.utils.defaultAbiCoder.encode(
-        ["address", "uint32", "address", "uint256", "bytes32"],
-        [sender, dstEid, to, amount, userTransferId],
+        ["address", "address", "uint32", "address", "uint256", "bytes32"],
+        [adapter, sender, dstEid, to, amount, userTransferId],
       ),
     );
   }
@@ -157,6 +158,7 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
     );
     expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
     const derivedTransferId = deriveTransferId(
+      adapterA.address,
       ownerA.address,
       eidB,
       ownerB.address,
@@ -295,6 +297,7 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
     );
     expect(await canonicalToken.balanceOf(canonicalCore.address)).to.equal(0);
     const derivedTransferId = deriveTransferId(
+      adapterA.address,
       ownerA.address,
       eidB,
       ethers.constants.AddressZero,
@@ -375,6 +378,7 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
       });
 
     const ownerTransferId = deriveTransferId(
+      adapterA.address,
       ownerA.address,
       eidB,
       ownerB.address,
@@ -382,6 +386,7 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
       userTransferId,
     );
     const attackerTransferId = deriveTransferId(
+      adapterA.address,
       attacker.address,
       eidB,
       ownerB.address,
