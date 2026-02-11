@@ -5,6 +5,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import { Token6022BridgeCoreBase } from "./Token6022BridgeCoreBase.sol";
 import { IToken6022BridgeCoreSatellite } from "./interfaces/IToken6022BridgeCoreSatellite/IToken6022BridgeCoreSatellite.sol";
+import { IToken6022BridgeCoreOwnable } from "./interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol";
 
 contract Token6022BridgeCoreSatellite is ERC20, Token6022BridgeCoreBase, IToken6022BridgeCoreSatellite {
     /// @notice Initializes a mint/burn satellite token for bridged liquidity.
@@ -14,6 +15,10 @@ contract Token6022BridgeCoreSatellite is ERC20, Token6022BridgeCoreBase, IToken6
     constructor(string memory _name, string memory _symbol, address _owner)
         ERC20(_name, _symbol)
         Token6022BridgeCoreBase(_owner) {}
+
+    function owner() public view override(Token6022BridgeCoreBase, IToken6022BridgeCoreOwnable) returns (address) {
+        return Token6022BridgeCoreBase.owner();
+    }
 
     /// @notice Burns satellite tokens on outbound bridge flow.
     /// @param _from Address providing satellite tokens.

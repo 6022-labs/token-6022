@@ -7,6 +7,7 @@ import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oa
 import { MessagingReceipt } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 
 import { IToken6022BridgeCore } from "../interfaces/IToken6022BridgeCore/IToken6022BridgeCore.sol";
+import { IToken6022BridgeCoreOwnable } from "../interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol";
 import { IToken6022BridgeAdapterLZ } from "../interfaces/adapters/IToken6022BridgeAdapterLZ/IToken6022BridgeAdapterLZ.sol";
 
 contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
@@ -14,11 +15,18 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
 
     mapping(uint32 dstEid => bytes options) public lzSendOptions;
 
+    modifier onlyCoreOwner() {
+        address coreOwner = IToken6022BridgeCoreOwnable(address(core)).owner();
+        if (msg.sender != coreOwner) {
+            revert OnlyCoreOwner(msg.sender, coreOwner);
+        }
+        _;
+    }
+
     /// @notice Initializes a LayerZero bridge adapter.
     /// @param _core Bridge core contract.
     /// @param _endpoint LayerZero endpoint address.
-    /// @param _owner Owner allowed to configure send options and peers.
-    constructor(address _core, address _endpoint, address _owner) OApp(_endpoint, _owner) Ownable(_owner) {
+    constructor(address _core, address _endpoint) OApp(_endpoint, address(this)) Ownable(address(this)) {
         if (_core == address(0)) {
             revert InvalidCore(_core);
         }
@@ -29,10 +37,15 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
     /// @notice Sets default LayerZero send options for a destination endpoint id.
     /// @param _dstEid LayerZero destination endpoint id.
     /// @param _options Encoded LayerZero execution options.
-    function setLzSendOptions(uint32 _dstEid, bytes calldata _options) external onlyOwner {
+    function setLzSendOptions(uint32 _dstEid, bytes calldata _options) external onlyCoreOwner {
         lzSendOptions[_dstEid] = _options;
 
         emit LzSendOptionsSet(_dstEid, _options);
+    }
+
+    /// @notice Sets trusted LayerZero peer, gated by current core owner.
+    function setPeer(uint32 _eid, bytes32 _peer) public override onlyCoreOwner {
+        _setPeer(_eid, _peer);
     }
 
     /// @notice Quotes LayerZero fee required for a bridge send.

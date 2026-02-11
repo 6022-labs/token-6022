@@ -44,12 +44,10 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
     const adapterA = (await adapterFactory.deploy(
       canonicalCore.address,
       router.address,
-      ownerA.address,
     )) as Contract;
     const adapterB = (await adapterFactory.deploy(
       satelliteCore.address,
       router.address,
-      ownerB.address,
     )) as Contract;
 
     await canonicalCore.connect(ownerA).setAdapter(adapterA.address, true);
@@ -327,7 +325,6 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
     const adapter = (await adapterFactory.deploy(
       core.address,
       router.address,
-      owner.address,
     )) as Contract;
 
     await core.setAdapter(adapter.address, true);

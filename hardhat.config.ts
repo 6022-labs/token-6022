@@ -24,6 +24,8 @@ const CCIP_CHAIN_SELECTOR_AMOY_TESTNET =
   process.env.CCIP_CHAIN_SELECTOR_AMOY_TESTNET ?? "16281711391670634445";
 const CCIP_CHAIN_SELECTOR_BASE_TESTNET =
   process.env.CCIP_CHAIN_SELECTOR_BASE_TESTNET ?? "10344971235874465080";
+const BRIDGE_OWNER_AMOY_TESTNET = process.env.BRIDGE_OWNER_AMOY_TESTNET;
+const BRIDGE_OWNER_BASE_TESTNET = process.env.BRIDGE_OWNER_BASE_TESTNET;
 
 const account: string = PRIVATE_KEY ?? "";
 
@@ -72,6 +74,13 @@ const config: HardhatUserConfig = {
             }
           : {}),
       },
+      ...(BRIDGE_OWNER_AMOY_TESTNET
+        ? {
+            bridgeGovernance: {
+              owner: BRIDGE_OWNER_AMOY_TESTNET,
+            },
+          }
+        : {}),
     },
     "base-testnet": {
       eid: EndpointId.BASESEP_V2_TESTNET,
@@ -93,6 +102,13 @@ const config: HardhatUserConfig = {
             }
           : {}),
       },
+      ...(BRIDGE_OWNER_BASE_TESTNET
+        ? {
+            bridgeGovernance: {
+              owner: BRIDGE_OWNER_BASE_TESTNET,
+            },
+          }
+        : {}),
     },
     hardhat: {
       allowUnlimitedContractSize: true,

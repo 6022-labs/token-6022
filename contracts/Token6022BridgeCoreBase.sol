@@ -4,6 +4,7 @@ pragma solidity ^0.8.22;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 import { IToken6022BridgeCore } from "./interfaces/IToken6022BridgeCore/IToken6022BridgeCore.sol";
+import { IToken6022BridgeCoreOwnable } from "./interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol";
 
 abstract contract Token6022BridgeCoreBase is Ownable, IToken6022BridgeCore {
     mapping(address adapter => bool enabled) public adapters;
@@ -22,6 +23,11 @@ abstract contract Token6022BridgeCoreBase is Ownable, IToken6022BridgeCore {
         }
 
         _;
+    }
+
+    /// @notice Returns the current owner.
+    function owner() public view virtual override(Ownable, IToken6022BridgeCoreOwnable) returns (address) {
+        return Ownable.owner();
     }
 
     /// @notice Enables or disables an adapter.

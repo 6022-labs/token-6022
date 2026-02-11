@@ -52,14 +52,12 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
       .deploy(
         canonicalCore.address,
         endpointA.address,
-        ownerA.address,
       )) as Contract;
     const adapterB = (await adapterFactory
       .connect(ownerB)
       .deploy(
         satelliteCore.address,
         endpointB.address,
-        ownerB.address,
       )) as Contract;
 
     await canonicalCore.connect(ownerA).setAdapter(adapterA.address, true);

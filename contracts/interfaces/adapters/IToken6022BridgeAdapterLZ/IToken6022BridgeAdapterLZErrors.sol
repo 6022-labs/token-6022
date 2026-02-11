@@ -2,6 +2,11 @@
 pragma solidity ^0.8.22;
 
 interface IToken6022BridgeAdapterLZErrors {
+    /// @notice Thrown when caller is not the current core owner.
+    /// @param caller Unauthorized caller.
+    /// @param expectedOwner Current bridge core owner.
+    error OnlyCoreOwner(address caller, address expectedOwner);
+
     /// @notice Thrown when deploying with a zero core address.
     /// @param core Invalid core address.
     error InvalidCore(address core);

@@ -40,6 +40,10 @@ CCIP_ROUTER_BASE_TESTNET=
 # https://docs.chain.link/cre/reference/sdk/evm-client-ts
 CCIP_CHAIN_SELECTOR_AMOY_TESTNET=16281711391670634445
 CCIP_CHAIN_SELECTOR_BASE_TESTNET=10344971235874465080
+
+# Governance owners (Safe/timelock addresses)
+BRIDGE_OWNER_AMOY_TESTNET=
+BRIDGE_OWNER_BASE_TESTNET=
 ```
 
 3. Review `hardhat.config.ts`:
@@ -48,6 +52,7 @@ CCIP_CHAIN_SELECTOR_BASE_TESTNET=10344971235874465080
 - `bridgeCore.tokenAddress` is required for canonical core.
 - `bridgeAdapters.lz` controls optional LZ adapter deployment.
 - `bridgeAdapters.ccip.router` controls optional CCIP adapter deployment.
+- `bridgeGovernance.owner` (or `BRIDGE_OWNER_*` env vars in `hardhat.config.ts`) sets the owner for bridge core contracts. Adapter admin actions are gated by the current core owner.
 
 ## Bridge Configuration
 
@@ -69,6 +74,7 @@ npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
 ```
 
 Adapter deploy scripts automatically authorize the deployed adapter on the local core via `setAdapter(adapter, true)`.
+When `bridgeGovernance.owner` is different from the deployer (for example a Safe), auto-authorization is skipped and must be executed by the configured owner.
 
 ### 3) Wire LayerZero (optional)
 
@@ -126,6 +132,7 @@ npx hardhat ccip:send \
 ```
 
 Notes:
+
 - Both tasks auto-generate a `transferId` unless you pass `--transfer-id`.
 - Both tasks auto-approve canonical token allowance to `Token6022BridgeCoreCanonical` if needed.
 - `lz:send` uses `--options 0x` by default, which falls back to stored `lzSendOptions`.

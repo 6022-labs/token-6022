@@ -2,6 +2,11 @@
 pragma solidity ^0.8.22;
 
 interface IToken6022BridgeAdapterCCIPErrors {
+    /// @notice Thrown when caller is not the current core owner.
+    /// @param caller Unauthorized caller.
+    /// @param expectedOwner Current bridge core owner.
+    error OnlyCoreOwner(address caller, address expectedOwner);
+
     /// @notice Thrown when no trusted remote CCIP peer is configured for destination chain.
     /// @param chainSelector Destination CCIP chain selector.
     error MissingCcipPeer(uint64 chainSelector);

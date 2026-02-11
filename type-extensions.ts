@@ -16,28 +16,36 @@ interface BridgeAdaptersConfig {
     }
 }
 
+interface BridgeGovernanceConfig {
+    owner?: string
+}
+
 declare module 'hardhat/types/config' {
     interface HardhatNetworkUserConfig {
         ccipChainSelector?: never
         bridgeCore?: never
         bridgeAdapters?: never
+        bridgeGovernance?: never
     }
 
     interface HardhatNetworkConfig {
         ccipChainSelector?: never
         bridgeCore?: never
         bridgeAdapters?: never
+        bridgeGovernance?: never
     }
 
     interface HttpNetworkUserConfig {
         ccipChainSelector?: string | bigint
         bridgeCore?: BridgeCoreConfig
         bridgeAdapters?: BridgeAdaptersConfig
+        bridgeGovernance?: BridgeGovernanceConfig
     }
 
     interface HttpNetworkConfig {
         ccipChainSelector?: string | bigint
         bridgeCore?: BridgeCoreConfig
         bridgeAdapters?: BridgeAdaptersConfig
+        bridgeGovernance?: BridgeGovernanceConfig
     }
 }

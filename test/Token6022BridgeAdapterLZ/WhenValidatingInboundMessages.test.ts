@@ -50,14 +50,12 @@ describe("When validating inbound messages in Token6022BridgeAdapterLZ", functio
       .deploy(
         canonicalCore.address,
         endpointA.address,
-        ownerA.address,
       )) as Contract;
     const adapterB = (await adapterFactory
       .connect(ownerB)
       .deploy(
         satelliteCore.address,
         endpointB.address,
-        ownerB.address,
       )) as Contract;
 
     await canonicalCore.connect(ownerA).setAdapter(adapterA.address, true);

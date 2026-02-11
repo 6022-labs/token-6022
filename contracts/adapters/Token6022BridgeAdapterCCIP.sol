@@ -1,26 +1,32 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.22;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-
 import { CCIPReceiver } from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
 import { IRouterClient } from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import { Client } from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 
 import { IToken6022BridgeCore } from "../interfaces/IToken6022BridgeCore/IToken6022BridgeCore.sol";
+import { IToken6022BridgeCoreOwnable } from "../interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol";
 import { IToken6022BridgeAdapterCCIP } from "../interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIP.sol";
 
-contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAdapterCCIP {
+contract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP {
     IToken6022BridgeCore public immutable core;
 
     mapping(uint64 chainSelector => address peer) public ccipPeers;
     mapping(uint64 chainSelector => bytes extraArgs) public ccipExtraArgs;
 
+    modifier onlyCoreOwner() {
+        address coreOwner = IToken6022BridgeCoreOwnable(address(core)).owner();
+        if (msg.sender != coreOwner) {
+            revert OnlyCoreOwner(msg.sender, coreOwner);
+        }
+        _;
+    }
+
     /// @notice Initializes a CCIP bridge adapter.
     /// @param _core Bridge core contract.
     /// @param _ccipRouter Chainlink CCIP router address.
-    /// @param _owner Owner allowed to configure peers and options.
-    constructor(address _core, address _ccipRouter, address _owner) CCIPReceiver(_ccipRouter) Ownable(_owner) {
+    constructor(address _core, address _ccipRouter) CCIPReceiver(_ccipRouter) {
         if (_core == address(0)) {
             revert InvalidCore(_core);
         }
@@ -31,7 +37,7 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
     /// @notice Sets the trusted remote CCIP adapter for a chain selector.
     /// @param _chainSelector CCIP chain selector.
     /// @param _peer Trusted remote adapter.
-    function setCcipPeer(uint64 _chainSelector, address _peer) external onlyOwner {
+    function setCcipPeer(uint64 _chainSelector, address _peer) external onlyCoreOwner {
         ccipPeers[_chainSelector] = _peer;
         emit CcipPeerSet(_chainSelector, _peer);
     }
@@ -39,7 +45,7 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, Ownable, IToken6022BridgeAd
     /// @notice Sets CCIP extra arguments for a destination chain selector.
     /// @param _chainSelector CCIP destination chain selector.
     /// @param _extraArgs Encoded CCIP execution options.
-    function setCcipExtraArgs(uint64 _chainSelector, bytes calldata _extraArgs) external onlyOwner {
+    function setCcipExtraArgs(uint64 _chainSelector, bytes calldata _extraArgs) external onlyCoreOwner {
         ccipExtraArgs[_chainSelector] = _extraArgs;
         emit CcipExtraArgsSet(_chainSelector, _extraArgs);
     }

@@ -42,12 +42,10 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
     const adapterA = (await adapterFactory.deploy(
       canonicalCore.address,
       router.address,
-      ownerA.address,
     )) as Contract;
     const adapterB = (await adapterFactory.deploy(
       satelliteCore.address,
       router.address,
-      ownerB.address,
     )) as Contract;
 
     await canonicalCore.connect(ownerA).setAdapter(adapterA.address, true);

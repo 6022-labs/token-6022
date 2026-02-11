@@ -26,6 +26,7 @@ const deploy: DeployFunction = async (hre) => {
   const { deployer } = await getNamedAccounts();
 
   assert(deployer, "Missing named deployer account");
+  const deployerAddress = hre.ethers.utils.getAddress(deployer);
 
   const ccipRouter = hre.network.config.bridgeAdapters?.ccip?.router;
   if (ccipRouter == null) {
@@ -44,20 +45,28 @@ const deploy: DeployFunction = async (hre) => {
 
   const { address } = await deploy(contractName, {
     from: deployer,
-    args: [coreDeployment.address, ccipRouter, deployer],
+    args: [coreDeployment.address, ccipRouter],
     log: true,
     skipIfAlreadyDeployed: true,
   });
 
   const isAuthorized = await read(coreName, "adapters", address);
   if (!isAuthorized) {
-    await execute(
-      coreName,
-      { from: deployer, log: true },
-      "setAdapter",
-      address,
-      true,
-    );
+    const coreOwner = hre.ethers.utils.getAddress(await read(coreName, "owner"));
+    if (coreOwner.toLowerCase() === deployerAddress.toLowerCase()) {
+      await execute(
+        coreName,
+        { from: deployer, log: true },
+        "setAdapter",
+        address,
+        true,
+      );
+    } else {
+      console.warn(
+        `[${contractName}] adapter ${address} was not auto-authorized because core owner (${coreOwner}) is not deployer (${deployerAddress}). ` +
+          `Authorize it from the core owner by calling ${coreName}.setAdapter(${address}, true).`,
+      );
+    }
   }
 
   console.log(`Deployed ${contractName} on ${hre.network.name}: ${address}`);

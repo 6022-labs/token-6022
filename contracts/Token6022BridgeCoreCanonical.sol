@@ -6,6 +6,7 @@ import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.s
 
 import { Token6022BridgeCoreBase } from "./Token6022BridgeCoreBase.sol";
 import { IToken6022BridgeCoreCanonical } from "./interfaces/IToken6022BridgeCoreCanonical/IToken6022BridgeCoreCanonical.sol";
+import { IToken6022BridgeCoreOwnable } from "./interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol";
 
 contract Token6022BridgeCoreCanonical is Token6022BridgeCoreBase, IToken6022BridgeCoreCanonical {
     using SafeERC20 for IERC20;
@@ -21,6 +22,10 @@ contract Token6022BridgeCoreCanonical is Token6022BridgeCoreBase, IToken6022Brid
         }
 
         token = _token;
+    }
+
+    function owner() public view override(Token6022BridgeCoreBase, IToken6022BridgeCoreOwnable) returns (address) {
+        return Token6022BridgeCoreBase.owner();
     }
 
     /// @notice Locks canonical tokens on outbound bridge flow.
