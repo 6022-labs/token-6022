@@ -53,7 +53,7 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
     /// @param _to Recipient on destination chain.
     /// @param _amount Token amount to bridge.
     /// @param _userTransferId User-provided transfer identifier entropy.
-    /// @param _options LayerZero execution options; empty uses stored defaults.
+    /// @param _options LayerZero execution options; empty uses stored defaults and reverts when unresolved.
     /// @param _payInLzToken True to quote in LZ token, false for native fee.
     /// @return fee LayerZero fee quote.
     function quoteLzSend(
@@ -76,7 +76,7 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
     /// @param _to Recipient on destination chain.
     /// @param _amount Token amount to bridge.
     /// @param _userTransferId User-provided transfer identifier entropy.
-    /// @param _options LayerZero execution options; empty uses stored defaults.
+    /// @param _options LayerZero execution options; empty uses stored defaults and reverts when unresolved.
     /// @return receipt LayerZero messaging receipt.
     function sendWithLz(
         uint32 _dstEid,
@@ -91,8 +91,6 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
 
         bytes32 transferId = _deriveTransferId(msg.sender, _dstEid, _to, _amount, _userTransferId);
 
-        core.bridgeOut(msg.sender, _amount, transferId);
-
         bytes memory payload = abi.encode(transferId, _to, _amount);
         bytes memory options = _resolveOptions(_dstEid, _options);
 
@@ -100,6 +98,8 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
         if (msg.value < quoted.nativeFee) {
             revert InvalidNativeFee(msg.value, quoted.nativeFee);
         }
+
+        core.bridgeOut(msg.sender, _amount, transferId);
 
         receipt = _lzSend(_dstEid, payload, options, MessagingFee(msg.value, 0), payable(msg.sender));
 
@@ -133,6 +133,10 @@ contract Token6022BridgeAdapterLZ is OApp, IToken6022BridgeAdapterLZ {
             options = lzSendOptions[_dstEid];
         } else {
             options = _options;
+        }
+
+        if (options.length == 0) {
+            revert MissingLzSendOptions(_dstEid);
         }
     }
 

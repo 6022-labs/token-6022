@@ -136,6 +136,7 @@ Notes:
 - Both tasks auto-generate a `transferId` unless you pass `--transfer-id`.
 - Both tasks auto-approve canonical token allowance to `Token6022BridgeCoreCanonical` if needed.
 - `lz:send` uses `--options 0x` by default, which falls back to stored `lzSendOptions`.
+- LayerZero sends/quotes revert when resolved options are empty, so configure non-empty `lzSendOptions` (or pass explicit `--options`).
 
 ## Build and Test
 

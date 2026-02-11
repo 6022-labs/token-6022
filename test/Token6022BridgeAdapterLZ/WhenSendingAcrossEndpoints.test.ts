@@ -263,6 +263,55 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
     expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
   });
 
+  it("Should revert when resolved send options are empty", async function () {
+    const { ownerA, ownerB, canonicalToken, canonicalCore, adapterA } =
+      await loadFixture(deployFixture);
+
+    const amount = ethers.utils.parseEther("1");
+    const transferId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+
+    await canonicalToken.connect(ownerA).approve(canonicalCore.address, amount);
+
+    await expect(
+      adapterA.quoteLzSend(
+        eidB,
+        ownerB.address,
+        amount,
+        transferId,
+        "0x",
+        false,
+      ),
+    )
+      .to.be.revertedWithCustomError(adapterA, "MissingLzSendOptions")
+      .withArgs(eidB);
+
+    await expect(
+      adapterA
+        .connect(ownerA)
+        .sendWithLz(eidB, ownerB.address, amount, transferId, "0x", {
+          value: 0,
+        }),
+    )
+      .to.be.revertedWithCustomError(adapterA, "MissingLzSendOptions")
+      .withArgs(eidB);
+
+    const derivedTransferId = deriveTransferId(
+      adapterA.address,
+      ownerA.address,
+      eidB,
+      ownerB.address,
+      amount,
+      transferId,
+    );
+    expect(await canonicalCore.outboundTransfers(derivedTransferId)).to.equal(
+      false,
+    );
+    expect(await canonicalToken.balanceOf(ownerA.address)).to.equal(
+      ethers.utils.parseEther("100"),
+    );
+    expect(await canonicalToken.balanceOf(canonicalCore.address)).to.equal(0);
+  });
+
   it("Should revert when recipient is zero address", async function () {
     const { ownerA, canonicalToken, canonicalCore, adapterA } =
       await loadFixture(deployFixture);

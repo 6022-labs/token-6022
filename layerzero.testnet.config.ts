@@ -1,4 +1,5 @@
 import { EndpointId } from "@layerzerolabs/lz-definitions";
+import { Options } from "@layerzerolabs/lz-v2-utilities";
 
 import {
   LzPointHardhat,
@@ -19,7 +20,10 @@ const amoyTestnetContract: LzPointHardhat = {
   contractName: "Token6022BridgeAdapterLZ",
 };
 
-const DEFAULT_LZ_OPTIONS = "0x";
+const DEFAULT_LZ_OPTIONS = Options.newOptions()
+  .addExecutorLzReceiveOption(200000, 0)
+  .toHex()
+  .toString();
 
 const pathways: LzTwoWayConfig[] = [
   [

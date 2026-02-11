@@ -19,4 +19,8 @@ interface IToken6022BridgeAdapterLZErrors {
     /// @param supplied Native value provided by caller.
     /// @param required Required native fee.
     error InvalidNativeFee(uint256 supplied, uint256 required);
+
+    /// @notice Thrown when no LayerZero send options are available for destination endpoint.
+    /// @param dstEid LayerZero destination endpoint id.
+    error MissingLzSendOptions(uint32 dstEid);
 }
