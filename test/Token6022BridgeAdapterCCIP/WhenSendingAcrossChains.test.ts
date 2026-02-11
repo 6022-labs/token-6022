@@ -144,6 +144,9 @@ describe("When sending through Token6022BridgeAdapterCCIP", function () {
     expect(await canonicalCore.outboundTransfers(derivedTransferId)).to.equal(
       true,
     );
+    expect(await satelliteCore.inboundTransfers(derivedTransferId)).to.equal(
+      true,
+    );
   });
 
   it("Should bridge back from satellite to canonical", async function () {

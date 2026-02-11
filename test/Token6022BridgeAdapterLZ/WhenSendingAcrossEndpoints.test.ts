@@ -156,6 +156,16 @@ describe("When sending through Token6022BridgeAdapterLZ", function () {
       amount,
     );
     expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
+    const derivedTransferId = deriveTransferId(
+      ownerA.address,
+      eidB,
+      ownerB.address,
+      amount,
+      transferId,
+    );
+    expect(await satelliteCore.inboundTransfers(derivedTransferId)).to.equal(
+      true,
+    );
   });
 
   it("Should bridge back from satellite to canonical", async function () {

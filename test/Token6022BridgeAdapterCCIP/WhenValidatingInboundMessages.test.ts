@@ -188,6 +188,7 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
         event.event === "CcipSend",
     );
     const derivedTransferId = sendEvent?.args?.transferId;
+    const replayMessageId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
 
     const data = ethers.utils.defaultAbiCoder.encode(
       ["bytes32", "address", "uint256"],
@@ -196,7 +197,7 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
 
     await expect(
       router.route(adapterB.address, {
-        messageId: ethers.utils.hexlify(ethers.utils.randomBytes(32)),
+        messageId: replayMessageId,
         sourceChainSelector: sourceSelector,
         sender: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -208,5 +209,13 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
     )
       .to.be.revertedWithCustomError(satelliteCore, "TransferReplay")
       .withArgs(derivedTransferId);
+
+    expect(await satelliteCore.balanceOf(ownerB.address)).to.equal(amount);
+    expect(await satelliteCore.inboundTransfers(derivedTransferId)).to.equal(
+      true,
+    );
+    expect(await satelliteCore.inboundTransportIds(replayMessageId)).to.equal(
+      false,
+    );
   });
 });
