@@ -116,6 +116,11 @@ contract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP
     /// @notice Handles inbound CCIP messages and forwards payload to core bridge logic.
     /// @param _message Incoming CCIP message.
     function _ccipReceive(Client.Any2EVMMessage memory _message) internal override {
+        // Belongs to native CCIP token transfer payload, which is not supported by this adapter
+        if (_message.destTokenAmounts.length != 0) {
+            revert UnsupportedCcipTokenPayload(_message.destTokenAmounts.length);
+        }
+
         bytes memory sourceSender = _message.sender;
         bytes memory expectedPeer = ccipPeers[_message.sourceChainSelector];
 

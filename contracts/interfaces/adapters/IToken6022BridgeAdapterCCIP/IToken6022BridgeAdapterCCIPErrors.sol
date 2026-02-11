@@ -33,4 +33,8 @@ interface IToken6022BridgeAdapterCCIPErrors {
     /// @param recipient Refund recipient.
     /// @param amount Refund amount.
     error NativeRefundFailed(address recipient, uint256 amount);
+
+    /// @notice Thrown when inbound CCIP message unexpectedly carries token amounts.
+    /// @param tokenCount Number of token entries in the payload.
+    error UnsupportedCcipTokenPayload(uint256 tokenCount);
 }

@@ -260,4 +260,38 @@ describe("When validating inbound messages in Token6022BridgeAdapterCCIP", funct
       false,
     );
   });
+
+  it("Should reject inbound token payloads", async function () {
+    const { ownerA, ownerB, router, adapterA, adapterB, satelliteCore } =
+      await loadFixture(deployFixture);
+
+    const transferId = ethers.utils.hexlify(ethers.utils.randomBytes(32));
+    const amount = ethers.utils.parseEther("1");
+    const data = ethers.utils.defaultAbiCoder.encode(
+      ["bytes32", "address", "uint256"],
+      [transferId, ownerB.address, amount],
+    );
+
+    await expect(
+      router.route(adapterB.address, {
+        messageId: ethers.utils.hexlify(ethers.utils.randomBytes(32)),
+        sourceChainSelector: sourceSelector,
+        sender: ethers.utils.defaultAbiCoder.encode(
+          ["address"],
+          [adapterA.address],
+        ),
+        data,
+        destTokenAmounts: [
+          {
+            token: ownerA.address,
+            amount: 1,
+          },
+        ],
+      }),
+    )
+      .to.be.revertedWithCustomError(adapterB, "UnsupportedCcipTokenPayload")
+      .withArgs(1);
+
+    expect(await satelliteCore.inboundTransfers(transferId)).to.equal(false);
+  });
 });
