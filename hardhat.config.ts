@@ -13,9 +13,9 @@ import {
 import { EndpointId } from "@layerzerolabs/lz-definitions";
 
 import "./type-extensions";
-import './tasks/ccipWire';
-import './tasks/bridgeSend';
-import './tasks/lzWire';
+import './tasks/ccip-wire';
+import './tasks/bridge-send';
+import './tasks/lz-wire';
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const CCIP_ROUTER_AMOY_TESTNET = process.env.CCIP_ROUTER_AMOY_TESTNET;

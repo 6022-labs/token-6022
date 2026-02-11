@@ -9,7 +9,7 @@ import {
     LzConnectionHardhat,
     LzOmniGraphHardhat,
     LzPointHardhat,
-} from './lzConfig'
+} from './lz-config'
 
 interface LzWireArgs {
     lzConfig: string

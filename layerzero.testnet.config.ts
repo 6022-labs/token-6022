@@ -5,7 +5,7 @@ import {
   LzTwoWayConfig,
   LzOmniGraphHardhat,
   generateLzConnectionsConfig,
-} from "./tasks/lzConfig";
+} from "./tasks/lz-config";
 
 const baseTestnetContract: LzPointHardhat = {
   network: "base-testnet",

@@ -10,7 +10,7 @@ import {
     CcipOmniGraphHardhat,
     CcipPointHardhat,
     normalizeChainSelector,
-} from './ccipConfig'
+} from './ccip-config'
 
 interface CcipWireArgs {
     ccipConfig: string
