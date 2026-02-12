@@ -20,6 +20,12 @@ const amoyTestnetContract: LzPointHardhat = {
   contractName: "Token6022BridgeAdapterLZ",
 };
 
+const citreaTestnetContract: LzPointHardhat = {
+  network: "citrea-testnet",
+  eid: EndpointId.CITREA_V2_TESTNET,
+  contractName: "Token6022BridgeAdapterLZ",
+};
+
 const DEFAULT_LZ_OPTIONS = Options.newOptions()
   .addExecutorLzReceiveOption(200000, 0)
   .toHex()
@@ -29,6 +35,16 @@ const pathways: LzTwoWayConfig[] = [
   [
     baseTestnetContract,
     amoyTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
+  [
+    amoyTestnetContract,
+    citreaTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
+  [
+    baseTestnetContract,
+    citreaTestnetContract,
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
 ];
@@ -43,6 +59,9 @@ export default async function (): Promise<LzOmniGraphHardhat> {
       },
       {
         contract: amoyTestnetContract,
+      },
+      {
+        contract: citreaTestnetContract,
       },
     ],
     connections,

@@ -1,6 +1,25 @@
 # 6022 Token Contracts
 
-This repository contains the 6022 token contracts, deployment scripts, and tests. It uses Hardhat + `hardhat-deploy` with a protocol-neutral bridge core and optional LayerZero / CCIP adapters.
+This repository contains the 6022 token contracts, deployment scripts, tests, and a Web3 bridge UI. It uses Hardhat + `hardhat-deploy` with a protocol-neutral bridge core and optional LayerZero / CCIP adapters.
+
+## Components
+
+### Smart Contracts
+
+- `Token6022BridgeCoreCanonical`: protocol-neutral lock/release core for canonical chain liquidity.
+- `Token6022BridgeCoreSatellite`: protocol-neutral mint/burn ERC20 core for satellite chains.
+- `Token6022BridgeAdapterLZ`: optional LayerZero transport adapter wired to one core.
+- `Token6022BridgeAdapterCCIP`: optional Chainlink CCIP transport adapter wired to one core.
+
+### Bridge UI
+
+A minimalist Web3 frontend for bridging tokens across chains. See [`bridge-ui/README.md`](bridge-ui/README.md) for setup instructions.
+
+Features:
+- Environment-configurable chain support
+- Wallet connection via Reown AppKit
+- Simple source/destination chain selection
+- Built with React + TypeScript + Vite
 
 ## Architecture
 
