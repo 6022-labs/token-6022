@@ -15,7 +15,9 @@ const deploy: DeployFunction = async (hre) => {
 
   const bridgeCoreConfig = hre.network.config.bridgeCore;
   if (bridgeCoreConfig?.type !== "satellite") {
-    console.log(`\n⏭️  Skipping ${contractName} - network is not satellite chain`);
+    console.log(
+      `\n⏭️  Skipping ${contractName} - network is not satellite chain`,
+    );
     return;
   }
 
@@ -23,7 +25,9 @@ const deploy: DeployFunction = async (hre) => {
   console.log(`🌐 Network: ${hre.network.name}`);
   console.log(`🪙  Token name/symbol: 6022/6022`);
   console.log(`👤 Owner: ${owner}`);
-  console.log(`💡 Note: This contract IS the ERC20 token (mints/burns on bridge)`);
+  console.log(
+    `💡 Note: This contract IS the ERC20 token (mints/burns on bridge)`,
+  );
 
   const { address } = await deploy(contractName, {
     from: deployer,

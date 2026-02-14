@@ -15,7 +15,9 @@ const deploy: DeployFunction = async (hre) => {
 
   const bridgeCoreConfig = hre.network.config.bridgeCore;
   if (bridgeCoreConfig?.type !== "canonical") {
-    console.log(`\n⏭️  Skipping ${contractName} - network is not canonical chain`);
+    console.log(
+      `\n⏭️  Skipping ${contractName} - network is not canonical chain`,
+    );
     return;
   }
 

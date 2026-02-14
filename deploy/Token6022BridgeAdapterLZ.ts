@@ -20,7 +20,9 @@ const deploy: DeployFunction = async (hre) => {
   }
 
   if (lzEndpoint == null) {
-    console.log(`\n⏭️  Skipping ${contractName} - LayerZero endpoint not configured`);
+    console.log(
+      `\n⏭️  Skipping ${contractName} - LayerZero endpoint not configured`,
+    );
     return;
   }
 

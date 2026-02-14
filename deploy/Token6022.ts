@@ -34,7 +34,9 @@ const deploy: DeployFunction = async (hre) => {
   }
 
   console.log(`\n🚀 Deploying ${contractName}...`);
-  console.log(`   Initial supply: ${ethers.utils.formatUnits(initialSupply, 18)} tokens`);
+  console.log(
+    `   Initial supply: ${ethers.utils.formatUnits(initialSupply, 18)} tokens`,
+  );
 
   const { address } = await deploy(contractName, {
     from: deployer,
