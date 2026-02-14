@@ -15,16 +15,22 @@ const deploy: DeployFunction = async (hre) => {
 
   const bridgeCoreConfig = hre.network.config.bridgeCore;
   if (bridgeCoreConfig?.type !== "canonical") {
+    console.log(`\n⏭️  Skipping ${contractName} - network is not canonical chain`);
     return;
   }
 
   const tokenAddress = bridgeCoreConfig.tokenAddress;
   if (tokenAddress == null) {
     console.warn(
-      `[${contractName}] tokenAddress missing in bridgeCore config, skipping deployment`,
+      `\n⚠️  [${contractName}] tokenAddress missing in bridgeCore config, skipping deployment`,
     );
     return;
   }
+
+  console.log(`\n🚀 Deploying ${contractName}...`);
+  console.log(`🌐 Network: ${hre.network.name}`);
+  console.log(`🪙  Token: ${tokenAddress}`);
+  console.log(`👤 Owner: ${owner}`);
 
   const { address } = await deploy(contractName, {
     from: deployer,
@@ -33,9 +39,9 @@ const deploy: DeployFunction = async (hre) => {
     skipIfAlreadyDeployed: true,
   });
 
-  console.log(
-    `Deployed ${contractName} on ${hre.network.name}: ${address} (owner=${owner})`,
-  );
+  console.log(`\n✅ ${contractName} deployed successfully!`);
+  console.log(`📍 Core address: ${address}`);
+  console.log(`🔒 Locks/releases from: ${tokenAddress}`);
 };
 
 deploy.tags = [contractName, "BridgeCore"];

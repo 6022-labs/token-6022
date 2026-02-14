@@ -20,12 +20,21 @@ const deploy: DeployFunction = async (hre) => {
   }
 
   if (lzEndpoint == null) {
+    console.log(`\n⏭️  Skipping ${contractName} - LayerZero endpoint not configured`);
     return;
   }
 
   const coreName = await resolveBridgeCoreName(hre, contractName);
 
+  console.log(`\n🚀 Deploying ${contractName}...`);
+  console.log(`🌐 Network: ${hre.network.name}`);
+  console.log(`🔗 Bridge Core: ${coreName}`);
+
   const coreDeployment = await deployments.get(coreName);
+
+  console.log(`📍 Core address: ${coreDeployment.address}`);
+  console.log(`📡 LayerZero endpoint: ${lzEndpoint}`);
+  console.log(`🔧 EID: ${hre.network.config.eid}`);
 
   const { address } = await deploy(contractName, {
     from: deployer,
@@ -34,10 +43,14 @@ const deploy: DeployFunction = async (hre) => {
     skipIfAlreadyDeployed: true,
   });
 
+  console.log(`\n🔐 Checking adapter authorization...`);
   const isAuthorized = await read(coreName, "adapters", address);
   if (!isAuthorized) {
-    const coreOwner = hre.ethers.utils.getAddress(await read(coreName, "owner"));
+    const coreOwner = hre.ethers.utils.getAddress(
+      await read(coreName, "owner"),
+    );
     if (coreOwner.toLowerCase() === deployerAddress.toLowerCase()) {
+      console.log(`🔓 Auto-authorizing adapter on core...`);
       await execute(
         coreName,
         { from: deployer, log: true },
@@ -45,19 +58,27 @@ const deploy: DeployFunction = async (hre) => {
         address,
         true,
       );
+      console.log(`✅ Adapter authorized!`);
     } else {
       console.warn(
-        `[${contractName}] adapter ${address} was not auto-authorized because core owner (${coreOwner}) is not deployer (${deployerAddress}). ` +
-          `Authorize it from the core owner by calling ${coreName}.setAdapter(${address}, true).`,
+        `\n⚠️  Adapter ${address} NOT auto-authorized!\n` +
+          `   Core owner (${coreOwner}) != deployer (${deployerAddress})\n` +
+          `   ⚡ Manual action required: call ${coreName}.setAdapter(${address}, true)`,
       );
     }
+  } else {
+    console.log(`✅ Adapter already authorized`);
   }
 
-  console.log(`Deployed ${contractName} on ${hre.network.name}: ${address}`);
+  console.log(`\n✅ ${contractName} deployed successfully!`);
+  console.log(`📍 Adapter address: ${address}`);
 };
 
 deploy.tags = [contractName, "BridgeAdapter"];
 
-deploy.dependencies = ["Token6022BridgeCoreCanonical", "Token6022BridgeCoreSatellite"];
+deploy.dependencies = [
+  "Token6022BridgeCoreCanonical",
+  "Token6022BridgeCoreSatellite",
+];
 
 export default deploy;

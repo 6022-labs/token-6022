@@ -15,23 +15,26 @@ const deploy: DeployFunction = async (hre) => {
 
   assert(deployer, "Missing named deployer account");
 
-  console.log(`Network: ${hre.network.name}`);
-  console.log(`Deployer: ${deployer}`);
+  console.log(`\n🌐 Network: ${hre.network.name}`);
+  console.log(`👤 Deployer: ${deployer}`);
 
   // Skip deployment if canonical token already exists and is configured.
   if (
     hre.network.config.bridgeCore?.type === "canonical" &&
     hre.network.config.bridgeCore.tokenAddress != null
   ) {
-    console.warn(
-      `6022 token already deployed on this network, skipping deployment`,
+    console.log(
+      `\n⏭️  Skipping ${contractName} deployment - canonical token already configured`,
     );
-    console.warn(
-      `Token address: ${hre.network.config.bridgeCore.tokenAddress}`,
+    console.log(
+      `📍 Token address: ${hre.network.config.bridgeCore.tokenAddress}`,
     );
 
     return;
   }
+
+  console.log(`\n🚀 Deploying ${contractName}...`);
+  console.log(`   Initial supply: ${ethers.utils.formatUnits(initialSupply, 18)} tokens`);
 
   const { address } = await deploy(contractName, {
     from: deployer,
@@ -44,9 +47,9 @@ const deploy: DeployFunction = async (hre) => {
     waitConfirmations: 1,
   });
 
-  console.log(
-    `Deployed contract: ${contractName}, network: ${hre.network.name}, address: ${address}`,
-  );
+  console.log(`\n✅ ${contractName} deployed successfully!`);
+  console.log(`📍 Address: ${address}`);
+  console.log(`🌐 Network: ${hre.network.name}`);
 };
 
 deploy.tags = [contractName];
