@@ -177,11 +177,14 @@ async function resolveAmountAndApproveIfNeeded(
       coreAddress,
     );
     if (allowance.lt(amountLD)) {
+      console.log(`\n✅ Approving canonical token...`);
+      console.log(`📍 Token: ${canonicalToken}`);
+      console.log(`🔀 Spender: ${coreAddress}`);
+      console.log(`💰 Amount: ${amountLD.toString()}`);
       const approvalTx = await asset.approve(coreAddress, amountLD);
       await approvalTx.wait();
-      console.log(
-        `[bridge:send] approved canonical token ${canonicalToken} for core ${coreAddress} tx=${approvalTx.hash}`,
-      );
+      console.log(`✅ Approval confirmed!`);
+      console.log(`📝 Tx: ${approvalTx.hash}`);
     }
   }
 
@@ -431,19 +434,23 @@ task("lz:send", "Sends a bridge transfer through Token6022BridgeAdapterLZ")
     );
     const nativeFee: BigNumber = quotedFee.nativeFee ?? quotedFee[0];
 
-    console.log(
-      `[lz:send] network=${hre.network.name} adapter=${adapterAddress} core=${coreAddress} ` +
-        `dstEid=${args.dstEid} to=${args.to} amount=${args.amount} decimals=${decimals} ` +
-        `transferId=${transferId} nativeFee=${nativeFee.toString()}`,
-    );
+    console.log(`\n🌉 LayerZero Bridge Send`);
+    console.log(`🌐 Network: ${hre.network.name}`);
+    console.log(`🔀 Adapter: ${adapterAddress}`);
+    console.log(`🔗 Core: ${coreAddress}`);
+    console.log(`🎯 Destination EID: ${args.dstEid}`);
+    console.log(`👤 Recipient: ${args.to}`);
+    console.log(`💰 Amount: ${args.amount} (${decimals} decimals)`);
+    console.log(`🔑 Transfer ID: ${transferId}`);
+    console.log(`💸 Native Fee: ${nativeFee.toString()}`);
     if (canonicalToken != null) {
-      console.log(
-        `[lz:send] source core type=canonical token=${canonicalToken}`,
-      );
+      console.log(`📦 Core Type: canonical`);
+      console.log(`🪙 Token: ${canonicalToken}`);
     } else {
-      console.log("[lz:send] source core type=satellite");
+      console.log(`📦 Core Type: satellite`);
     }
 
+    console.log(`\n🚀 Sending bridge transaction...`);
     const tx = await adapter.sendWithLz(
       args.dstEid,
       args.to,
@@ -457,9 +464,10 @@ task("lz:send", "Sends a bridge transfer through Token6022BridgeAdapterLZ")
     const receipt = await tx.wait();
     const guid = findEventArg(receipt, "LzSend", "guid");
 
-    console.log(`[lz:send] tx=${tx.hash}`);
+    console.log(`\n✅ Bridge transaction sent successfully!`);
+    console.log(`📝 Tx: ${tx.hash}`);
     if (guid != null) {
-      console.log(`[lz:send] guid=${guid}`);
+      console.log(`🆔 GUID: ${guid}`);
     }
   });
 
@@ -534,19 +542,23 @@ task("ccip:send", "Sends a bridge transfer through Token6022BridgeAdapterCCIP")
       transferId,
     );
 
-    console.log(
-      `[ccip:send] network=${hre.network.name} adapter=${adapterAddress} core=${coreAddress} ` +
-        `dstChainSelector=${args.dstChainSelector} to=${args.to} amount=${args.amount} decimals=${decimals} ` +
-        `transferId=${transferId} nativeFee=${quotedFee.toString()}`,
-    );
+    console.log(`\n🌉 CCIP Bridge Send`);
+    console.log(`🌐 Network: ${hre.network.name}`);
+    console.log(`🔀 Adapter: ${adapterAddress}`);
+    console.log(`🔗 Core: ${coreAddress}`);
+    console.log(`🎯 Destination Chain Selector: ${args.dstChainSelector}`);
+    console.log(`👤 Recipient: ${args.to}`);
+    console.log(`💰 Amount: ${args.amount} (${decimals} decimals)`);
+    console.log(`🔑 Transfer ID: ${transferId}`);
+    console.log(`💸 Native Fee: ${quotedFee.toString()}`);
     if (canonicalToken != null) {
-      console.log(
-        `[ccip:send] source core type=canonical token=${canonicalToken}`,
-      );
+      console.log(`📦 Core Type: canonical`);
+      console.log(`🪙 Token: ${canonicalToken}`);
     } else {
-      console.log("[ccip:send] source core type=satellite");
+      console.log(`📦 Core Type: satellite`);
     }
 
+    console.log(`\n🚀 Sending bridge transaction...`);
     const tx = await adapter.sendWithCcip(
       args.dstChainSelector,
       args.to,
@@ -559,8 +571,9 @@ task("ccip:send", "Sends a bridge transfer through Token6022BridgeAdapterCCIP")
     const receipt = await tx.wait();
     const messageId = findEventArg(receipt, "CcipSend", "messageId");
 
-    console.log(`[ccip:send] tx=${tx.hash}`);
+    console.log(`\n✅ Bridge transaction sent successfully!`);
+    console.log(`📝 Tx: ${tx.hash}`);
     if (messageId != null) {
-      console.log(`[ccip:send] messageId=${messageId}`);
+      console.log(`🆔 Message ID: ${messageId}`);
     }
   });

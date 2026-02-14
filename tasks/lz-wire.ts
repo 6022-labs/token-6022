@@ -92,17 +92,23 @@ async function configureConnection(
     const currentPeer = (await contract.peers(connection.to.eid)).toLowerCase()
 
     if (currentPeer !== remotePeer) {
-        const action = `[lz:wire] setPeer eid=${connection.to.eid} peer=${remotePeer}`
-
         if (dryRun) {
-            console.log(`${action} (dry-run)`)
+            console.log(`\n🔧 Setting LayerZero peer (dry-run)`)
+            console.log(`🎯 EID: ${connection.to.eid}`)
+            console.log(`🤝 Peer: ${remotePeer}`)
         } else {
+            console.log(`\n🔧 Setting LayerZero peer...`)
+            console.log(`🎯 EID: ${connection.to.eid}`)
+            console.log(`🤝 Peer: ${remotePeer}`)
             const tx = await contract.setPeer(connection.to.eid, remotePeer)
             await tx.wait()
-            console.log(`${action} tx=${tx.hash}`)
+            console.log(`✅ Peer configured!`)
+            console.log(`📝 Tx: ${tx.hash}`)
         }
     } else {
-        console.log(`[lz:wire] peer already configured eid=${connection.to.eid} peer=${remotePeer}`)
+        console.log(`\n✅ Peer already configured`)
+        console.log(`🎯 EID: ${connection.to.eid}`)
+        console.log(`🤝 Peer: ${remotePeer}`)
     }
 
     if (connection.fromOptions != null) {
@@ -110,17 +116,23 @@ async function configureConnection(
         const currentOptions = normalizeHexBytes(await contract.lzSendOptions(connection.to.eid), hre)
 
         if (currentOptions !== desiredOptions) {
-            const action = `[lz:wire] setLzSendOptions eid=${connection.to.eid} options=${desiredOptions}`
-
             if (dryRun) {
-                console.log(`${action} (dry-run)`)
+                console.log(`\n🔧 Setting LayerZero send options (dry-run)`)
+                console.log(`🎯 EID: ${connection.to.eid}`)
+                console.log(`⚙️  Options: ${desiredOptions}`)
             } else {
+                console.log(`\n🔧 Setting LayerZero send options...`)
+                console.log(`🎯 EID: ${connection.to.eid}`)
+                console.log(`⚙️  Options: ${desiredOptions}`)
                 const tx = await contract.setLzSendOptions(connection.to.eid, desiredOptions)
                 await tx.wait()
-                console.log(`${action} tx=${tx.hash}`)
+                console.log(`✅ Options configured!`)
+                console.log(`📝 Tx: ${tx.hash}`)
             }
         } else {
-            console.log(`[lz:wire] options already configured eid=${connection.to.eid} options=${desiredOptions}`)
+            console.log(`\n✅ Options already configured`)
+            console.log(`🎯 EID: ${connection.to.eid}`)
+            console.log(`⚙️  Options: ${desiredOptions}`)
         }
     }
 }
@@ -135,7 +147,9 @@ task('lz:wire', 'Configures LayerZero peers/options from a mesh config file')
         const localConnections = graph.connections.filter((connection) => connection.from.network === localNetwork)
 
         if (localConnections.length === 0) {
-            console.warn(`[lz:wire] no outbound connection found for network "${localNetwork}" in ${args.lzConfig}`)
+            console.log(`\n⚠️  No outbound LayerZero connections found`)
+            console.log(`🌐 Network: ${localNetwork}`)
+            console.log(`📄 Config: ${args.lzConfig}`)
             return
         }
 
@@ -145,16 +159,19 @@ task('lz:wire', 'Configures LayerZero peers/options from a mesh config file')
             throw new Error('No signer available for this network')
         }
 
-        console.log(`[lz:wire] network=${localNetwork} connections=${localConnections.length} signer=${signer.address}`)
+        console.log(`\n🔗 LayerZero Wire Configuration`)
+        console.log(`🌐 Network: ${localNetwork}`)
+        console.log(`🔀 Connections: ${localConnections.length}`)
+        console.log(`👤 Signer: ${signer.address}`)
 
         for (const connection of localConnections) {
             const localAddress = await resolvePointAddress(connection.from, hre)
             const contract = await hre.ethers.getContractAt(LZ_CONFIGURABLE_ABI, localAddress, signer)
 
-            console.log(
-                `[lz:wire] local=${connection.from.contractName ?? localAddress} (${localAddress}) ` +
-                    `-> remoteNetwork=${connection.to.network}`
-            )
+            console.log(`\n🔗 Configuring connection`)
+            console.log(`📍 Local: ${connection.from.contractName ?? localAddress}`)
+            console.log(`   Address: ${localAddress}`)
+            console.log(`🌍 Remote Network: ${connection.to.network}`)
 
             await configureConnection(connection, hre, contract, args.dryRun)
         }

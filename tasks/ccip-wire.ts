@@ -98,19 +98,23 @@ async function configureConnection(
     const currentPeer = await contract.ccipPeers(destinationChainSelector)
 
     if (normalizeHexBytes(currentPeer, hre) !== normalizeHexBytes(remotePeer, hre)) {
-        const action = `[ccip:wire] setCcipPeer selector=${destinationChainSelector} peer=${remotePeer}`
-
         if (dryRun) {
-            console.log(`${action} (dry-run)`)
+            console.log(`\n🔧 Setting CCIP peer (dry-run)`)
+            console.log(`🎯 Selector: ${destinationChainSelector}`)
+            console.log(`🤝 Peer: ${remotePeer}`)
         } else {
+            console.log(`\n🔧 Setting CCIP peer...`)
+            console.log(`🎯 Selector: ${destinationChainSelector}`)
+            console.log(`🤝 Peer: ${remotePeer}`)
             const tx = await contract.setCcipPeer(destinationChainSelector, remotePeer)
             await tx.wait()
-            console.log(`${action} tx=${tx.hash}`)
+            console.log(`✅ Peer configured!`)
+            console.log(`📝 Tx: ${tx.hash}`)
         }
     } else {
-        console.log(
-            `[ccip:wire] peer already configured selector=${destinationChainSelector} peer=${remotePeer}`
-        )
+        console.log(`\n✅ Peer already configured`)
+        console.log(`🎯 Selector: ${destinationChainSelector}`)
+        console.log(`🤝 Peer: ${remotePeer}`)
     }
 
     if (connection.fromExtraArgs != null) {
@@ -118,19 +122,23 @@ async function configureConnection(
         const currentExtraArgs = normalizeHexBytes(await contract.ccipExtraArgs(destinationChainSelector), hre)
 
         if (currentExtraArgs !== desiredExtraArgs) {
-            const action = `[ccip:wire] setCcipExtraArgs selector=${destinationChainSelector} extraArgs=${desiredExtraArgs}`
-
             if (dryRun) {
-                console.log(`${action} (dry-run)`)
+                console.log(`\n🔧 Setting CCIP extra args (dry-run)`)
+                console.log(`🎯 Selector: ${destinationChainSelector}`)
+                console.log(`⚙️  Extra Args: ${desiredExtraArgs}`)
             } else {
+                console.log(`\n🔧 Setting CCIP extra args...`)
+                console.log(`🎯 Selector: ${destinationChainSelector}`)
+                console.log(`⚙️  Extra Args: ${desiredExtraArgs}`)
                 const tx = await contract.setCcipExtraArgs(destinationChainSelector, desiredExtraArgs)
                 await tx.wait()
-                console.log(`${action} tx=${tx.hash}`)
+                console.log(`✅ Extra args configured!`)
+                console.log(`📝 Tx: ${tx.hash}`)
             }
         } else {
-            console.log(
-                `[ccip:wire] extraArgs already configured selector=${destinationChainSelector} extraArgs=${desiredExtraArgs}`
-            )
+            console.log(`\n✅ Extra args already configured`)
+            console.log(`🎯 Selector: ${destinationChainSelector}`)
+            console.log(`⚙️  Extra Args: ${desiredExtraArgs}`)
         }
     }
 }
@@ -145,9 +153,9 @@ task('ccip:wire', 'Configures CCIP peers/extraArgs from a mesh config file')
         const localConnections = graph.connections.filter((connection) => connection.from.network === localNetwork)
 
         if (localConnections.length === 0) {
-            console.warn(
-                `[ccip:wire] no outbound CCIP connection found for network "${localNetwork}" in ${args.ccipConfig}`
-            )
+            console.log(`\n⚠️  No outbound CCIP connections found`)
+            console.log(`🌐 Network: ${localNetwork}`)
+            console.log(`📄 Config: ${args.ccipConfig}`)
             return
         }
 
@@ -157,18 +165,19 @@ task('ccip:wire', 'Configures CCIP peers/extraArgs from a mesh config file')
             throw new Error('No signer available for this network')
         }
 
-        console.log(
-            `[ccip:wire] network=${localNetwork} connections=${localConnections.length} signer=${signer.address}`
-        )
+        console.log(`\n🔗 CCIP Wire Configuration`)
+        console.log(`🌐 Network: ${localNetwork}`)
+        console.log(`🔀 Connections: ${localConnections.length}`)
+        console.log(`👤 Signer: ${signer.address}`)
 
         for (const connection of localConnections) {
             const localAddress = await resolvePointAddress(connection.from, hre)
             const contract = await hre.ethers.getContractAt(CCIP_CONFIGURABLE_ABI, localAddress, signer)
 
-            console.log(
-                `[ccip:wire] local=${connection.from.contractName ?? localAddress} (${localAddress}) ` +
-                    `-> remoteNetwork=${connection.to.network}`
-            )
+            console.log(`\n🔗 Configuring connection`)
+            console.log(`📍 Local: ${connection.from.contractName ?? localAddress}`)
+            console.log(`   Address: ${localAddress}`)
+            console.log(`🌍 Remote Network: ${connection.to.network}`)
 
             await configureConnection(connection, hre, contract, args.dryRun)
         }
