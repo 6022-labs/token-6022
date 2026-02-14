@@ -12,6 +12,7 @@ import { EndpointId } from "@layerzerolabs/lz-definitions";
 
 import "./type-extensions";
 import "./tasks/ccip-wire";
+import "./tasks/bridge-diagnostics";
 import "./tasks/bridge-send";
 import "./tasks/lz-wire";
 

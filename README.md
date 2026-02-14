@@ -157,6 +157,15 @@ Notes:
 - `lz:send` uses `--options 0x` by default, which falls back to stored `lzSendOptions`.
 - LayerZero sends/quotes revert when resolved options are empty, so configure non-empty `lzSendOptions` (or pass explicit `--options`).
 
+### 6) Diagnose wiring + live quotes (optional)
+
+```bash
+npx hardhat bridge:diagnostics --network amoy-testnet --to 0xYourRecipient
+npx hardhat bridge:diagnostics --network amoy-testnet --to 0xYourRecipient --protocol lz
+```
+
+This task prints configured vs expected peers/options (LZ) and peers/extraArgs (CCIP), then performs a live fee quote per outbound route on the current source network.
+
 ## Build and Test
 
 ```bash
