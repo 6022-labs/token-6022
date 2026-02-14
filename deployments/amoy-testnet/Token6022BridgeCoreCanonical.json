@@ -1,0 +1,727 @@
+{
+  "address": "0xbB2CEbf252EaDdf1674Cc7C458FCf4877704820F",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_owner",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "adapter",
+          "type": "address"
+        }
+      ],
+      "name": "InvalidAdapter",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidAmount",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "InvalidToken",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "caller",
+          "type": "address"
+        }
+      ],
+      "name": "OnlyAdapter",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "name": "SafeERC20FailedOperation",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "transferId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "TransferReplay",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "transportId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "TransportReplay",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "adapter",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "enabled",
+          "type": "bool"
+        }
+      ],
+      "name": "AdapterSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "transferId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "transportId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "BridgeIn",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "transferId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "BridgeOut",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "adapter",
+          "type": "address"
+        }
+      ],
+      "name": "adapters",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "enabled",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_transferId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_transportId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "bridgeIn",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_transferId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "bridgeOut",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "transferId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "inboundTransfers",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "consumed",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "transportId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "inboundTransportIds",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "consumed",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "transferId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "outboundTransfers",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "consumed",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_adapter",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_enabled",
+          "type": "bool"
+        }
+      ],
+      "name": "setAdapter",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x3027c0960225ec810b589e9b9cbb3edd648a903555ed381d8bb304d867658e17",
+  "receipt": {
+    "to": null,
+    "from": "0x4bca9E17a8326d283d1fC68A725B46b42c2D9146",
+    "contractAddress": "0xbB2CEbf252EaDdf1674Cc7C458FCf4877704820F",
+    "transactionIndex": 0,
+    "gasUsed": "553958",
+    "logsBloom": "0x00000000000000000000000000000001000000000000000000800000000000000000000000000000000000000000000000008000000100000000000000000001000000000000000000000000000000800001000000000000000100000000000000000000020000000000000000000800000000000000000080000000000000400000000000000000020000000400000000000000000000000000020000000000200000000000000000000000000000000000000000000000000000000000004000000000000000000001000000000000000000408000000000100000000020000000000000000000000000000000000000000000000000000000000000300000",
+    "blockHash": "0xa762533eed482b196a7898e8110d9bb1f7f52458671c5af8034e31fa5615ea9f",
+    "transactionHash": "0x3027c0960225ec810b589e9b9cbb3edd648a903555ed381d8bb304d867658e17",
+    "logs": [
+      {
+        "transactionIndex": 0,
+        "blockNumber": 33789183,
+        "transactionHash": "0x3027c0960225ec810b589e9b9cbb3edd648a903555ed381d8bb304d867658e17",
+        "address": "0xbB2CEbf252EaDdf1674Cc7C458FCf4877704820F",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x0000000000000000000000004bca9e17a8326d283d1fc68a725b46b42c2d9146"
+        ],
+        "data": "0x",
+        "logIndex": 0,
+        "blockHash": "0xa762533eed482b196a7898e8110d9bb1f7f52458671c5af8034e31fa5615ea9f"
+      },
+      {
+        "transactionIndex": 0,
+        "blockNumber": 33789183,
+        "transactionHash": "0x3027c0960225ec810b589e9b9cbb3edd648a903555ed381d8bb304d867658e17",
+        "address": "0x0000000000000000000000000000000000001010",
+        "topics": [
+          "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+          "0x0000000000000000000000000000000000000000000000000000000000001010",
+          "0x0000000000000000000000004bca9e17a8326d283d1fc68a725b46b42c2d9146",
+          "0x0000000000000000000000007ee41d8a25641000661b1ef5e6ae8a00400466b0"
+        ],
+        "data": "0x00000000000000000000000000000000000000000000000002b8366f59e5fea6000000000000000000000000000000000000000000000000069dd5c83d2e7213000000000000000000000000000000000000000000002156f99873ffff98b26400000000000000000000000000000000000000000000000003e59f58e348736d000000000000000000000000000000000000000000002156fc50aa6f597eb10a",
+        "logIndex": 1,
+        "blockHash": "0xa762533eed482b196a7898e8110d9bb1f7f52458671c5af8034e31fa5615ea9f"
+      }
+    ],
+    "blockNumber": 33789183,
+    "cumulativeGasUsed": "553958",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x26adaf578361953e8F1aC86D3e4Ca153493af5cB",
+    "0x4bca9E17a8326d283d1fC68A725B46b42c2D9146"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "c7f3c7bc2113265409df1b36afc191e0",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.22+commit.4fc1097e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_token\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"adapter\",\"type\":\"address\"}],\"name\":\"InvalidAdapter\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidAmount\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"}],\"name\":\"InvalidToken\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"OnlyAdapter\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"}],\"name\":\"SafeERC20FailedOperation\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"transferId\",\"type\":\"bytes32\"}],\"name\":\"TransferReplay\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"transportId\",\"type\":\"bytes32\"}],\"name\":\"TransportReplay\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"adapter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"enabled\",\"type\":\"bool\"}],\"name\":\"AdapterSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"transferId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"transportId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"BridgeIn\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"transferId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"BridgeOut\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"adapter\",\"type\":\"address\"}],\"name\":\"adapters\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"enabled\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_transferId\",\"type\":\"bytes32\"},{\"internalType\":\"bytes32\",\"name\":\"_transportId\",\"type\":\"bytes32\"}],\"name\":\"bridgeIn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_from\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_transferId\",\"type\":\"bytes32\"}],\"name\":\"bridgeOut\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"transferId\",\"type\":\"bytes32\"}],\"name\":\"inboundTransfers\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"consumed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"transportId\",\"type\":\"bytes32\"}],\"name\":\"inboundTransportIds\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"consumed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"transferId\",\"type\":\"bytes32\"}],\"name\":\"outboundTransfers\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"consumed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_adapter\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_enabled\",\"type\":\"bool\"}],\"name\":\"setAdapter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"token\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"errors\":{\"InvalidAdapter(address)\":[{\"params\":{\"adapter\":\"Invalid adapter address.\"}}],\"InvalidToken(address)\":[{\"params\":{\"token\":\"Invalid token address.\"}}],\"OnlyAdapter(address)\":[{\"params\":{\"caller\":\"Unauthorized caller address.\"}}],\"OwnableInvalidOwner(address)\":[{\"details\":\"The owner is not a valid owner account. (eg. `address(0)`)\"}],\"OwnableUnauthorizedAccount(address)\":[{\"details\":\"The caller account is not authorized to perform an operation.\"}],\"SafeERC20FailedOperation(address)\":[{\"details\":\"An operation with an ERC-20 token failed.\"}],\"TransferReplay(bytes32)\":[{\"params\":{\"transferId\":\"Replayed transfer identifier.\"}}],\"TransportReplay(bytes32)\":[{\"params\":{\"transportId\":\"Replayed transport identifier.\"}}]},\"events\":{\"AdapterSet(address,bool)\":{\"params\":{\"adapter\":\"Adapter address.\",\"enabled\":\"Whether the adapter is enabled.\"}},\"BridgeIn(bytes32,bytes32,address,uint256)\":{\"params\":{\"amount\":\"Bridged token amount.\",\"to\":\"Recipient address on this chain.\",\"transferId\":\"Cross-chain transfer identifier.\",\"transportId\":\"Transport-level message identifier.\"}},\"BridgeOut(bytes32,address,uint256)\":{\"params\":{\"amount\":\"Bridged token amount.\",\"from\":\"Source address on this chain.\",\"transferId\":\"Cross-chain transfer identifier.\"}}},\"kind\":\"dev\",\"methods\":{\"bridgeIn(address,uint256,bytes32,bytes32)\":{\"params\":{\"_amount\":\"Token amount bridged in.\",\"_to\":\"Recipient of bridged tokens.\",\"_transferId\":\"Cross-chain transfer identifier.\",\"_transportId\":\"Transport-level message identifier.\"}},\"bridgeOut(address,uint256,bytes32)\":{\"params\":{\"_amount\":\"Token amount bridged out.\",\"_from\":\"Address whose tokens are bridged out.\",\"_transferId\":\"Cross-chain transfer identifier.\"}},\"constructor\":{\"params\":{\"_owner\":\"Owner allowed to manage adapters.\",\"_token\":\"Canonical ERC20 token address.\"}},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner.\"},\"setAdapter(address,bool)\":{\"params\":{\"_adapter\":\"Adapter address to update.\",\"_enabled\":\"Whether the adapter is authorized.\"}},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"stateVariables\":{\"token\":{\"return\":\"Canonical token address.\",\"returns\":{\"_0\":\"Canonical token address.\"}}},\"version\":1},\"userdoc\":{\"errors\":{\"InvalidAdapter(address)\":[{\"notice\":\"Thrown when attempting to configure a zero adapter address.\"}],\"InvalidAmount()\":[{\"notice\":\"Thrown when the bridged amount is zero.\"}],\"InvalidToken(address)\":[{\"notice\":\"Thrown when deploying with a zero canonical token address.\"}],\"OnlyAdapter(address)\":[{\"notice\":\"Thrown when a caller is not an authorized bridge adapter.\"}],\"TransferReplay(bytes32)\":[{\"notice\":\"Thrown when a transfer identifier has already been consumed.\"}],\"TransportReplay(bytes32)\":[{\"notice\":\"Thrown when a transport identifier has already been consumed.\"}]},\"events\":{\"AdapterSet(address,bool)\":{\"notice\":\"Emitted when an adapter authorization is updated.\"},\"BridgeIn(bytes32,bytes32,address,uint256)\":{\"notice\":\"Emitted when an inbound bridge operation is processed.\"},\"BridgeOut(bytes32,address,uint256)\":{\"notice\":\"Emitted when an outbound bridge operation is processed.\"}},\"kind\":\"user\",\"methods\":{\"adapters(address)\":{\"notice\":\"Returns whether an adapter is authorized to call bridge methods.\"},\"bridgeIn(address,uint256,bytes32,bytes32)\":{\"notice\":\"Processes inbound bridge flow and marks transfer and transport ids as consumed.\"},\"bridgeOut(address,uint256,bytes32)\":{\"notice\":\"Processes outbound bridge flow and marks transfer id as consumed.\"},\"constructor\":{\"notice\":\"Initializes canonical bridge core for an existing ERC20 token.\"},\"inboundTransfers(bytes32)\":{\"notice\":\"Returns whether an inbound transfer identifier has been consumed.\"},\"inboundTransportIds(bytes32)\":{\"notice\":\"Returns whether an inbound transport identifier has been consumed.\"},\"outboundTransfers(bytes32)\":{\"notice\":\"Returns whether an outbound transfer identifier has been consumed.\"},\"setAdapter(address,bool)\":{\"notice\":\"Enables or disables an adapter.\"},\"token()\":{\"notice\":\"Returns the canonical ERC20 token locked by this core.\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Token6022BridgeCoreCanonical.sol\":\"Token6022BridgeCoreCanonical\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (access/Ownable.sol)\\n\\npragma solidity ^0.8.20;\\n\\nimport {Context} from \\\"../utils/Context.sol\\\";\\n\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * The initial owner is set to the address provided by the deployer. This can\\n * later be changed with {transferOwnership}.\\n *\\n * This module is used through inheritance. It will make available the modifier\\n * `onlyOwner`, which can be applied to your functions to restrict their use to\\n * the owner.\\n */\\nabstract contract Ownable is Context {\\n    address private _owner;\\n\\n    /**\\n     * @dev The caller account is not authorized to perform an operation.\\n     */\\n    error OwnableUnauthorizedAccount(address account);\\n\\n    /**\\n     * @dev The owner is not a valid owner account. (eg. `address(0)`)\\n     */\\n    error OwnableInvalidOwner(address owner);\\n\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @dev Initializes the contract setting the address provided by the deployer as the initial owner.\\n     */\\n    constructor(address initialOwner) {\\n        if (initialOwner == address(0)) {\\n            revert OwnableInvalidOwner(address(0));\\n        }\\n        _transferOwnership(initialOwner);\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the owner.\\n     */\\n    modifier onlyOwner() {\\n        _checkOwner();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Returns the address of the current owner.\\n     */\\n    function owner() public view virtual returns (address) {\\n        return _owner;\\n    }\\n\\n    /**\\n     * @dev Throws if the sender is not the owner.\\n     */\\n    function _checkOwner() internal view virtual {\\n        if (owner() != _msgSender()) {\\n            revert OwnableUnauthorizedAccount(_msgSender());\\n        }\\n    }\\n\\n    /**\\n     * @dev Leaves the contract without owner. It will not be possible to call\\n     * `onlyOwner` functions. Can only be called by the current owner.\\n     *\\n     * NOTE: Renouncing ownership will leave the contract without an owner,\\n     * thereby disabling any functionality that is only available to the owner.\\n     */\\n    function renounceOwnership() public virtual onlyOwner {\\n        _transferOwnership(address(0));\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual onlyOwner {\\n        if (newOwner == address(0)) {\\n            revert OwnableInvalidOwner(address(0));\\n        }\\n        _transferOwnership(newOwner);\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Internal function without access restriction.\\n     */\\n    function _transferOwnership(address newOwner) internal virtual {\\n        address oldOwner = _owner;\\n        _owner = newOwner;\\n        emit OwnershipTransferred(oldOwner, newOwner);\\n    }\\n}\\n\",\"keccak256\":\"0xff6d0bb2e285473e5311d9d3caacb525ae3538a80758c10649a4d61029b017bb\",\"license\":\"MIT\"},\"@openzeppelin/contracts/interfaces/IERC1363.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.4.0) (interfaces/IERC1363.sol)\\n\\npragma solidity >=0.6.2;\\n\\nimport {IERC20} from \\\"./IERC20.sol\\\";\\nimport {IERC165} from \\\"./IERC165.sol\\\";\\n\\n/**\\n * @title IERC1363\\n * @dev Interface of the ERC-1363 standard as defined in the https://eips.ethereum.org/EIPS/eip-1363[ERC-1363].\\n *\\n * Defines an extension interface for ERC-20 tokens that supports executing code on a recipient contract\\n * after `transfer` or `transferFrom`, or code on a spender contract after `approve`, in a single transaction.\\n */\\ninterface IERC1363 is IERC20, IERC165 {\\n    /*\\n     * Note: the ERC-165 identifier for this interface is 0xb0202a11.\\n     * 0xb0202a11 ===\\n     *   bytes4(keccak256('transferAndCall(address,uint256)')) ^\\n     *   bytes4(keccak256('transferAndCall(address,uint256,bytes)')) ^\\n     *   bytes4(keccak256('transferFromAndCall(address,address,uint256)')) ^\\n     *   bytes4(keccak256('transferFromAndCall(address,address,uint256,bytes)')) ^\\n     *   bytes4(keccak256('approveAndCall(address,uint256)')) ^\\n     *   bytes4(keccak256('approveAndCall(address,uint256,bytes)'))\\n     */\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from the caller's account to `to`\\n     * and then calls {IERC1363Receiver-onTransferReceived} on `to`.\\n     * @param to The address which you want to transfer to.\\n     * @param value The amount of tokens to be transferred.\\n     * @return A boolean value indicating whether the operation succeeded unless throwing.\\n     */\\n    function transferAndCall(address to, uint256 value) external returns (bool);\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from the caller's account to `to`\\n     * and then calls {IERC1363Receiver-onTransferReceived} on `to`.\\n     * @param to The address which you want to transfer to.\\n     * @param value The amount of tokens to be transferred.\\n     * @param data Additional data with no specified format, sent in call to `to`.\\n     * @return A boolean value indicating whether the operation succeeded unless throwing.\\n     */\\n    function transferAndCall(address to, uint256 value, bytes calldata data) external returns (bool);\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from `from` to `to` using the allowance mechanism\\n     * and then calls {IERC1363Receiver-onTransferReceived} on `to`.\\n     * @param from The address which you want to send tokens from.\\n     * @param to The address which you want to transfer to.\\n     * @param value The amount of tokens to be transferred.\\n     * @return A boolean value indicating whether the operation succeeded unless throwing.\\n     */\\n    function transferFromAndCall(address from, address to, uint256 value) external returns (bool);\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from `from` to `to` using the allowance mechanism\\n     * and then calls {IERC1363Receiver-onTransferReceived} on `to`.\\n     * @param from The address which you want to send tokens from.\\n     * @param to The address which you want to transfer to.\\n     * @param value The amount of tokens to be transferred.\\n     * @param data Additional data with no specified format, sent in call to `to`.\\n     * @return A boolean value indicating whether the operation succeeded unless throwing.\\n     */\\n    function transferFromAndCall(address from, address to, uint256 value, bytes calldata data) external returns (bool);\\n\\n    /**\\n     * @dev Sets a `value` amount of tokens as the allowance of `spender` over the\\n     * caller's tokens and then calls {IERC1363Spender-onApprovalReceived} on `spender`.\\n     * @param spender The address which will spend the funds.\\n     * @param value The amount of tokens to be spent.\\n     * @return A boolean value indicating whether the operation succeeded unless throwing.\\n     */\\n    function approveAndCall(address spender, uint256 value) external returns (bool);\\n\\n    /**\\n     * @dev Sets a `value` amount of tokens as the allowance of `spender` over the\\n     * caller's tokens and then calls {IERC1363Spender-onApprovalReceived} on `spender`.\\n     * @param spender The address which will spend the funds.\\n     * @param value The amount of tokens to be spent.\\n     * @param data Additional data with no specified format, sent in call to `spender`.\\n     * @return A boolean value indicating whether the operation succeeded unless throwing.\\n     */\\n    function approveAndCall(address spender, uint256 value, bytes calldata data) external returns (bool);\\n}\\n\",\"keccak256\":\"0xd5ea07362ab630a6a3dee4285a74cf2377044ca2e4be472755ad64d7c5d4b69d\",\"license\":\"MIT\"},\"@openzeppelin/contracts/interfaces/IERC165.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.4.0) (interfaces/IERC165.sol)\\n\\npragma solidity >=0.4.16;\\n\\nimport {IERC165} from \\\"../utils/introspection/IERC165.sol\\\";\\n\",\"keccak256\":\"0x0afcb7e740d1537b252cb2676f600465ce6938398569f09ba1b9ca240dde2dfc\",\"license\":\"MIT\"},\"@openzeppelin/contracts/interfaces/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.4.0) (interfaces/IERC20.sol)\\n\\npragma solidity >=0.4.16;\\n\\nimport {IERC20} from \\\"../token/ERC20/IERC20.sol\\\";\\n\",\"keccak256\":\"0x1a6221315ce0307746c2c4827c125d821ee796c74a676787762f4778671d4f44\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.4.0) (token/ERC20/IERC20.sol)\\n\\npragma solidity >=0.4.16;\\n\\n/**\\n * @dev Interface of the ERC-20 standard as defined in the ERC.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n\\n    /**\\n     * @dev Returns the value of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the value of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from the caller's account to `to`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address to, uint256 value) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets a `value` amount of tokens as the allowance of `spender` over the\\n     * caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 value) external returns (bool);\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from `from` to `to` using the\\n     * allowance mechanism. `value` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(address from, address to, uint256 value) external returns (bool);\\n}\\n\",\"keccak256\":\"0x74ed01eb66b923d0d0cfe3be84604ac04b76482a55f9dd655e1ef4d367f95bc2\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.3.0) (token/ERC20/utils/SafeERC20.sol)\\n\\npragma solidity ^0.8.20;\\n\\nimport {IERC20} from \\\"../IERC20.sol\\\";\\nimport {IERC1363} from \\\"../../../interfaces/IERC1363.sol\\\";\\n\\n/**\\n * @title SafeERC20\\n * @dev Wrappers around ERC-20 operations that throw on failure (when the token\\n * contract returns false). Tokens that return no value (and instead revert or\\n * throw on failure) are also supported, non-reverting calls are assumed to be\\n * successful.\\n * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,\\n * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.\\n */\\nlibrary SafeERC20 {\\n    /**\\n     * @dev An operation with an ERC-20 token failed.\\n     */\\n    error SafeERC20FailedOperation(address token);\\n\\n    /**\\n     * @dev Indicates a failed `decreaseAllowance` request.\\n     */\\n    error SafeERC20FailedDecreaseAllowance(address spender, uint256 currentAllowance, uint256 requestedDecrease);\\n\\n    /**\\n     * @dev Transfer `value` amount of `token` from the calling contract to `to`. If `token` returns no value,\\n     * non-reverting calls are assumed to be successful.\\n     */\\n    function safeTransfer(IERC20 token, address to, uint256 value) internal {\\n        _callOptionalReturn(token, abi.encodeCall(token.transfer, (to, value)));\\n    }\\n\\n    /**\\n     * @dev Transfer `value` amount of `token` from `from` to `to`, spending the approval given by `from` to the\\n     * calling contract. If `token` returns no value, non-reverting calls are assumed to be successful.\\n     */\\n    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {\\n        _callOptionalReturn(token, abi.encodeCall(token.transferFrom, (from, to, value)));\\n    }\\n\\n    /**\\n     * @dev Variant of {safeTransfer} that returns a bool instead of reverting if the operation is not successful.\\n     */\\n    function trySafeTransfer(IERC20 token, address to, uint256 value) internal returns (bool) {\\n        return _callOptionalReturnBool(token, abi.encodeCall(token.transfer, (to, value)));\\n    }\\n\\n    /**\\n     * @dev Variant of {safeTransferFrom} that returns a bool instead of reverting if the operation is not successful.\\n     */\\n    function trySafeTransferFrom(IERC20 token, address from, address to, uint256 value) internal returns (bool) {\\n        return _callOptionalReturnBool(token, abi.encodeCall(token.transferFrom, (from, to, value)));\\n    }\\n\\n    /**\\n     * @dev Increase the calling contract's allowance toward `spender` by `value`. If `token` returns no value,\\n     * non-reverting calls are assumed to be successful.\\n     *\\n     * IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the \\\"client\\\"\\n     * smart contract uses ERC-7674 to set temporary allowances, then the \\\"client\\\" smart contract should avoid using\\n     * this function. Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract\\n     * that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior.\\n     */\\n    function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {\\n        uint256 oldAllowance = token.allowance(address(this), spender);\\n        forceApprove(token, spender, oldAllowance + value);\\n    }\\n\\n    /**\\n     * @dev Decrease the calling contract's allowance toward `spender` by `requestedDecrease`. If `token` returns no\\n     * value, non-reverting calls are assumed to be successful.\\n     *\\n     * IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the \\\"client\\\"\\n     * smart contract uses ERC-7674 to set temporary allowances, then the \\\"client\\\" smart contract should avoid using\\n     * this function. Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract\\n     * that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior.\\n     */\\n    function safeDecreaseAllowance(IERC20 token, address spender, uint256 requestedDecrease) internal {\\n        unchecked {\\n            uint256 currentAllowance = token.allowance(address(this), spender);\\n            if (currentAllowance < requestedDecrease) {\\n                revert SafeERC20FailedDecreaseAllowance(spender, currentAllowance, requestedDecrease);\\n            }\\n            forceApprove(token, spender, currentAllowance - requestedDecrease);\\n        }\\n    }\\n\\n    /**\\n     * @dev Set the calling contract's allowance toward `spender` to `value`. If `token` returns no value,\\n     * non-reverting calls are assumed to be successful. Meant to be used with tokens that require the approval\\n     * to be set to zero before setting it to a non-zero value, such as USDT.\\n     *\\n     * NOTE: If the token implements ERC-7674, this function will not modify any temporary allowance. This function\\n     * only sets the \\\"standard\\\" allowance. Any temporary allowance will remain active, in addition to the value being\\n     * set here.\\n     */\\n    function forceApprove(IERC20 token, address spender, uint256 value) internal {\\n        bytes memory approvalCall = abi.encodeCall(token.approve, (spender, value));\\n\\n        if (!_callOptionalReturnBool(token, approvalCall)) {\\n            _callOptionalReturn(token, abi.encodeCall(token.approve, (spender, 0)));\\n            _callOptionalReturn(token, approvalCall);\\n        }\\n    }\\n\\n    /**\\n     * @dev Performs an {ERC1363} transferAndCall, with a fallback to the simple {ERC20} transfer if the target has no\\n     * code. This can be used to implement an {ERC721}-like safe transfer that rely on {ERC1363} checks when\\n     * targeting contracts.\\n     *\\n     * Reverts if the returned value is other than `true`.\\n     */\\n    function transferAndCallRelaxed(IERC1363 token, address to, uint256 value, bytes memory data) internal {\\n        if (to.code.length == 0) {\\n            safeTransfer(token, to, value);\\n        } else if (!token.transferAndCall(to, value, data)) {\\n            revert SafeERC20FailedOperation(address(token));\\n        }\\n    }\\n\\n    /**\\n     * @dev Performs an {ERC1363} transferFromAndCall, with a fallback to the simple {ERC20} transferFrom if the target\\n     * has no code. This can be used to implement an {ERC721}-like safe transfer that rely on {ERC1363} checks when\\n     * targeting contracts.\\n     *\\n     * Reverts if the returned value is other than `true`.\\n     */\\n    function transferFromAndCallRelaxed(\\n        IERC1363 token,\\n        address from,\\n        address to,\\n        uint256 value,\\n        bytes memory data\\n    ) internal {\\n        if (to.code.length == 0) {\\n            safeTransferFrom(token, from, to, value);\\n        } else if (!token.transferFromAndCall(from, to, value, data)) {\\n            revert SafeERC20FailedOperation(address(token));\\n        }\\n    }\\n\\n    /**\\n     * @dev Performs an {ERC1363} approveAndCall, with a fallback to the simple {ERC20} approve if the target has no\\n     * code. This can be used to implement an {ERC721}-like safe transfer that rely on {ERC1363} checks when\\n     * targeting contracts.\\n     *\\n     * NOTE: When the recipient address (`to`) has no code (i.e. is an EOA), this function behaves as {forceApprove}.\\n     * Opposedly, when the recipient address (`to`) has code, this function only attempts to call {ERC1363-approveAndCall}\\n     * once without retrying, and relies on the returned value to be true.\\n     *\\n     * Reverts if the returned value is other than `true`.\\n     */\\n    function approveAndCallRelaxed(IERC1363 token, address to, uint256 value, bytes memory data) internal {\\n        if (to.code.length == 0) {\\n            forceApprove(token, to, value);\\n        } else if (!token.approveAndCall(to, value, data)) {\\n            revert SafeERC20FailedOperation(address(token));\\n        }\\n    }\\n\\n    /**\\n     * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement\\n     * on the return value: the return value is optional (but if data is returned, it must not be false).\\n     * @param token The token targeted by the call.\\n     * @param data The call data (encoded using abi.encode or one of its variants).\\n     *\\n     * This is a variant of {_callOptionalReturnBool} that reverts if call fails to meet the requirements.\\n     */\\n    function _callOptionalReturn(IERC20 token, bytes memory data) private {\\n        uint256 returnSize;\\n        uint256 returnValue;\\n        assembly (\\\"memory-safe\\\") {\\n            let success := call(gas(), token, 0, add(data, 0x20), mload(data), 0, 0x20)\\n            // bubble errors\\n            if iszero(success) {\\n                let ptr := mload(0x40)\\n                returndatacopy(ptr, 0, returndatasize())\\n                revert(ptr, returndatasize())\\n            }\\n            returnSize := returndatasize()\\n            returnValue := mload(0)\\n        }\\n\\n        if (returnSize == 0 ? address(token).code.length == 0 : returnValue != 1) {\\n            revert SafeERC20FailedOperation(address(token));\\n        }\\n    }\\n\\n    /**\\n     * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement\\n     * on the return value: the return value is optional (but if data is returned, it must not be false).\\n     * @param token The token targeted by the call.\\n     * @param data The call data (encoded using abi.encode or one of its variants).\\n     *\\n     * This is a variant of {_callOptionalReturn} that silently catches all reverts and returns a bool instead.\\n     */\\n    function _callOptionalReturnBool(IERC20 token, bytes memory data) private returns (bool) {\\n        bool success;\\n        uint256 returnSize;\\n        uint256 returnValue;\\n        assembly (\\\"memory-safe\\\") {\\n            success := call(gas(), token, 0, add(data, 0x20), mload(data), 0, 0x20)\\n            returnSize := returndatasize()\\n            returnValue := mload(0)\\n        }\\n        return success && (returnSize == 0 ? address(token).code.length > 0 : returnValue == 1);\\n    }\\n}\\n\",\"keccak256\":\"0x982c5cb790ab941d1e04f807120a71709d4c313ba0bfc16006447ffbd27fbbd5\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Context.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.1) (utils/Context.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract Context {\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n\\n    function _contextSuffixLength() internal view virtual returns (uint256) {\\n        return 0;\\n    }\\n}\\n\",\"keccak256\":\"0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/introspection/IERC165.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.4.0) (utils/introspection/IERC165.sol)\\n\\npragma solidity >=0.4.16;\\n\\n/**\\n * @dev Interface of the ERC-165 standard, as defined in the\\n * https://eips.ethereum.org/EIPS/eip-165[ERC].\\n *\\n * Implementers can declare support of contract interfaces, which can then be\\n * queried by others ({ERC165Checker}).\\n *\\n * For an implementation, see {ERC165}.\\n */\\ninterface IERC165 {\\n    /**\\n     * @dev Returns true if this contract implements the interface defined by\\n     * `interfaceId`. See the corresponding\\n     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[ERC section]\\n     * to learn more about how these ids are created.\\n     *\\n     * This function call must use less than 30 000 gas.\\n     */\\n    function supportsInterface(bytes4 interfaceId) external view returns (bool);\\n}\\n\",\"keccak256\":\"0x8891738ffe910f0cf2da09566928589bf5d63f4524dd734fd9cedbac3274dd5c\",\"license\":\"MIT\"},\"contracts/Token6022BridgeCoreBase.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport { Ownable } from \\\"@openzeppelin/contracts/access/Ownable.sol\\\";\\n\\nimport { IToken6022BridgeCore } from \\\"./interfaces/IToken6022BridgeCore/IToken6022BridgeCore.sol\\\";\\nimport { IToken6022BridgeCoreOwnable } from \\\"./interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol\\\";\\n\\nabstract contract Token6022BridgeCoreBase is Ownable, IToken6022BridgeCore {\\n    mapping(address adapter => bool enabled) public adapters;\\n\\n    mapping(bytes32 transferId => bool consumed) public outboundTransfers;\\n    mapping(bytes32 transferId => bool consumed) public inboundTransfers;\\n    mapping(bytes32 transportId => bool consumed) public inboundTransportIds;\\n\\n    /// @notice Initializes bridge core ownership.\\n    /// @param _owner Owner allowed to manage adapters.\\n    constructor(address _owner) Ownable(_owner) {}\\n\\n    modifier onlyAdapter() {\\n        if (!adapters[msg.sender]) {\\n            revert OnlyAdapter(msg.sender);\\n        }\\n\\n        _;\\n    }\\n\\n    /// @notice Returns the current owner.\\n    function owner() public view virtual override(Ownable, IToken6022BridgeCoreOwnable) returns (address) {\\n        return Ownable.owner();\\n    }\\n\\n    /// @notice Enables or disables an adapter.\\n    /// @param _adapter Adapter address to update.\\n    /// @param _enabled Whether the adapter is authorized.\\n    function setAdapter(address _adapter, bool _enabled) external onlyOwner {\\n        if (_adapter == address(0)) {\\n            revert InvalidAdapter(_adapter);\\n        }\\n\\n        adapters[_adapter] = _enabled;\\n\\n        emit AdapterSet(_adapter, _enabled);\\n    }\\n\\n    /// @notice Processes outbound bridge flow and marks transfer id as consumed.\\n    /// @param _from Address whose tokens are bridged out.\\n    /// @param _amount Token amount bridged out.\\n    /// @param _transferId Cross-chain transfer identifier.\\n    function bridgeOut(address _from, uint256 _amount, bytes32 _transferId) external onlyAdapter {\\n        if (_amount == 0) {\\n            revert InvalidAmount();\\n        }\\n\\n        if (outboundTransfers[_transferId] || inboundTransfers[_transferId]) {\\n            revert TransferReplay(_transferId);\\n        }\\n\\n        outboundTransfers[_transferId] = true;\\n\\n        _bridgeOut(_from, _amount);\\n\\n        emit BridgeOut(_transferId, _from, _amount);\\n    }\\n\\n    /// @notice Processes inbound bridge flow and marks transfer and transport ids as consumed.\\n    /// @param _to Recipient of bridged tokens.\\n    /// @param _amount Token amount bridged in.\\n    /// @param _transferId Cross-chain transfer identifier.\\n    /// @param _transportId Transport-level message identifier.\\n    function bridgeIn(address _to, uint256 _amount, bytes32 _transferId, bytes32 _transportId) external onlyAdapter {\\n        if (_amount == 0) {\\n            revert InvalidAmount();\\n        }\\n\\n        if (inboundTransportIds[_transportId]) {\\n            revert TransportReplay(_transportId);\\n        }\\n\\n        if (inboundTransfers[_transferId] || outboundTransfers[_transferId]) {\\n            revert TransferReplay(_transferId);\\n        }\\n\\n        inboundTransportIds[_transportId] = true;\\n        inboundTransfers[_transferId] = true;\\n\\n        _bridgeIn(_to, _amount);\\n\\n        emit BridgeIn(_transferId, _transportId, _to, _amount);\\n    }\\n\\n    /// @notice Executes asset handling for outbound bridge flow.\\n    /// @param _from Address whose tokens are bridged out.\\n    /// @param _amount Token amount bridged out.\\n    function _bridgeOut(address _from, uint256 _amount) internal virtual;\\n\\n    /// @notice Executes asset handling for inbound bridge flow.\\n    /// @param _to Recipient of bridged tokens.\\n    /// @param _amount Token amount bridged in.\\n    function _bridgeIn(address _to, uint256 _amount) internal virtual;\\n}\\n\",\"keccak256\":\"0xb32f3798a65f723a278cfeba2a05f6bb1e27228e1c6abab51cfa21c12f9a42f3\",\"license\":\"UNLICENSED\"},\"contracts/Token6022BridgeCoreCanonical.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport { IERC20 } from \\\"@openzeppelin/contracts/token/ERC20/IERC20.sol\\\";\\nimport { SafeERC20 } from \\\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\\\";\\n\\nimport { Token6022BridgeCoreBase } from \\\"./Token6022BridgeCoreBase.sol\\\";\\nimport { IToken6022BridgeCoreCanonical } from \\\"./interfaces/IToken6022BridgeCoreCanonical/IToken6022BridgeCoreCanonical.sol\\\";\\nimport { IToken6022BridgeCoreOwnable } from \\\"./interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol\\\";\\n\\ncontract Token6022BridgeCoreCanonical is Token6022BridgeCoreBase, IToken6022BridgeCoreCanonical {\\n    using SafeERC20 for IERC20;\\n\\n    address public immutable token;\\n\\n    /// @notice Initializes canonical bridge core for an existing ERC20 token.\\n    /// @param _token Canonical ERC20 token address.\\n    /// @param _owner Owner allowed to manage adapters.\\n    constructor(address _token, address _owner) Token6022BridgeCoreBase(_owner) {\\n        if (_token == address(0)) {\\n            revert InvalidToken(_token);\\n        }\\n\\n        token = _token;\\n    }\\n\\n    function owner() public view override(Token6022BridgeCoreBase, IToken6022BridgeCoreOwnable) returns (address) {\\n        return Token6022BridgeCoreBase.owner();\\n    }\\n\\n    /// @notice Locks canonical tokens on outbound bridge flow.\\n    /// @param _from Address providing canonical tokens.\\n    /// @param _amount Token amount bridged out.\\n    function _bridgeOut(address _from, uint256 _amount) internal override {\\n        IERC20(token).safeTransferFrom(_from, address(this), _amount);\\n    }\\n\\n    /// @notice Releases canonical tokens on inbound bridge flow.\\n    /// @param _to Recipient of canonical tokens.\\n    /// @param _amount Token amount bridged in.\\n    function _bridgeIn(address _to, uint256 _amount) internal override {\\n        IERC20(token).safeTransfer(_to, _amount);\\n    }\\n}\\n\",\"keccak256\":\"0x9b614334b05aefc4fd92694e84227462035bc545d5c556f9335e73379c9e5354\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCore.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport {IToken6022BridgeCoreErrors} from \\\"./IToken6022BridgeCoreErrors.sol\\\";\\nimport {IToken6022BridgeCoreEvents} from \\\"./IToken6022BridgeCoreEvents.sol\\\";\\nimport {IToken6022BridgeCoreStates} from \\\"./IToken6022BridgeCoreStates.sol\\\";\\nimport {IToken6022BridgeCoreActions} from \\\"./IToken6022BridgeCoreActions.sol\\\";\\nimport {IToken6022BridgeCoreOwnable} from \\\"./IToken6022BridgeCoreOwnable.sol\\\";\\n\\ninterface IToken6022BridgeCore is\\n    IToken6022BridgeCoreErrors,\\n    IToken6022BridgeCoreEvents,\\n    IToken6022BridgeCoreStates,\\n    IToken6022BridgeCoreActions,\\n    IToken6022BridgeCoreOwnable\\n{\\n}\\n\",\"keccak256\":\"0x32974e66dda5385c86947c1ee8d77203f406f479977f8399657ab4d02b9dcd79\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreActions.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreActions {\\n    /// @notice Enables or disables a bridge adapter.\\n    /// @param adapter Adapter address to update.\\n    /// @param enabled Whether the adapter should be authorized.\\n    function setAdapter(address adapter, bool enabled) external;\\n\\n    /// @notice Processes an outbound bridge operation on the current chain.\\n    /// @param from Address providing tokens on outbound bridge.\\n    /// @param amount Token amount bridged out.\\n    /// @param transferId Cross-chain transfer identifier.\\n    function bridgeOut(address from, uint256 amount, bytes32 transferId) external;\\n\\n    /// @notice Processes an inbound bridge operation on the current chain.\\n    /// @param to Recipient of bridged tokens.\\n    /// @param amount Token amount bridged in.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param transportId Transport-level message identifier.\\n    function bridgeIn(address to, uint256 amount, bytes32 transferId, bytes32 transportId) external;\\n}\\n\",\"keccak256\":\"0x82531af50677f200a05199a18df353ca7f97ea460dbcff5a10d53f69b0ecb1b5\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreErrors.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreErrors {\\n    /// @notice Thrown when a caller is not an authorized bridge adapter.\\n    /// @param caller Unauthorized caller address.\\n    error OnlyAdapter(address caller);\\n\\n    /// @notice Thrown when attempting to configure a zero adapter address.\\n    /// @param adapter Invalid adapter address.\\n    error InvalidAdapter(address adapter);\\n\\n    /// @notice Thrown when the bridged amount is zero.\\n    error InvalidAmount();\\n\\n    /// @notice Thrown when a transfer identifier has already been consumed.\\n    /// @param transferId Replayed transfer identifier.\\n    error TransferReplay(bytes32 transferId);\\n\\n    /// @notice Thrown when a transport identifier has already been consumed.\\n    /// @param transportId Replayed transport identifier.\\n    error TransportReplay(bytes32 transportId);\\n}\\n\",\"keccak256\":\"0xbcf2e82030fe54cb26a04e3746d749bd0e5bdb0caca868280ec7277d20350c7e\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreEvents.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreEvents {\\n    /// @notice Emitted when an adapter authorization is updated.\\n    /// @param adapter Adapter address.\\n    /// @param enabled Whether the adapter is enabled.\\n    event AdapterSet(address indexed adapter, bool enabled);\\n\\n    /// @notice Emitted when an outbound bridge operation is processed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param from Source address on this chain.\\n    /// @param amount Bridged token amount.\\n    event BridgeOut(bytes32 indexed transferId, address indexed from, uint256 amount);\\n\\n    /// @notice Emitted when an inbound bridge operation is processed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param transportId Transport-level message identifier.\\n    /// @param to Recipient address on this chain.\\n    /// @param amount Bridged token amount.\\n    event BridgeIn(bytes32 indexed transferId, bytes32 indexed transportId, address indexed to, uint256 amount);\\n}\\n\",\"keccak256\":\"0xbf17cc108014789f70eeaee9b01890c02bde522ae4e15498a7b51cbb76ab054a\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreOwnable {\\n    function owner() external view returns (address);\\n}\\n\",\"keccak256\":\"0x6d5c687e275f0b8ecafe7dfbf52e4903abc6266724543162cb8f17f690ed926d\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreStates.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreStates {\\n    /// @notice Returns whether an adapter is authorized to call bridge methods.\\n    /// @param adapter Adapter address to query.\\n    /// @return enabled True when adapter is authorized.\\n    function adapters(address adapter) external view returns (bool enabled);\\n\\n    /// @notice Returns whether an outbound transfer identifier has been consumed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @return consumed True when the transfer has already been used.\\n    function outboundTransfers(bytes32 transferId) external view returns (bool consumed);\\n\\n    /// @notice Returns whether an inbound transfer identifier has been consumed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @return consumed True when the transfer has already been used.\\n    function inboundTransfers(bytes32 transferId) external view returns (bool consumed);\\n\\n    /// @notice Returns whether an inbound transport identifier has been consumed.\\n    /// @param transportId Transport-level message identifier.\\n    /// @return consumed True when the transport identifier has already been used.\\n    function inboundTransportIds(bytes32 transportId) external view returns (bool consumed);\\n}\\n\",\"keccak256\":\"0xb089bd4901021710bd256c3e13c5b1e4c3d7616b007252babc34bbce6c75aa13\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCoreCanonical/IToken6022BridgeCoreCanonical.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport { IToken6022BridgeCore } from \\\"../IToken6022BridgeCore/IToken6022BridgeCore.sol\\\";\\nimport { IToken6022BridgeCoreCanonicalErrors } from \\\"./IToken6022BridgeCoreCanonicalErrors.sol\\\";\\nimport { IToken6022BridgeCoreCanonicalStates } from \\\"./IToken6022BridgeCoreCanonicalStates.sol\\\";\\n\\ninterface IToken6022BridgeCoreCanonical is\\n    IToken6022BridgeCore,\\n    IToken6022BridgeCoreCanonicalErrors,\\n    IToken6022BridgeCoreCanonicalStates\\n{\\n}\\n\",\"keccak256\":\"0xabec2d5fd39e2e95f57d9dec407f1f13badf696dba228828f6c17a090c788a75\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCoreCanonical/IToken6022BridgeCoreCanonicalErrors.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreCanonicalErrors {\\n    /// @notice Thrown when deploying with a zero canonical token address.\\n    /// @param token Invalid token address.\\n    error InvalidToken(address token);\\n}\\n\",\"keccak256\":\"0x45efa1cbca475f70704d33766230bc5adf8344742ccd254f2801dde663f1e29e\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCoreCanonical/IToken6022BridgeCoreCanonicalStates.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreCanonicalStates {\\n    /// @notice Returns the canonical ERC20 token locked by this core.\\n    /// @return Canonical token address.\\n    function token() external view returns (address);\\n}\\n\",\"keccak256\":\"0x59783d77742cda748d31f1651d84577bc3c0ab5195bce10e4a075dcbb55de9e6\",\"license\":\"UNLICENSED\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b506040516109fe3803806109fe83398101604081905261002f9161011b565b80806001600160a01b03811661006057604051631e4fbdf760e01b8152600060048201526024015b60405180910390fd5b610069816100af565b50506001600160a01b03821661009d5760405163961c9a4f60e01b81526001600160a01b0383166004820152602401610057565b506001600160a01b031660805261014e565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b80516001600160a01b038116811461011657600080fd5b919050565b6000806040838503121561012e57600080fd5b610137836100ff565b9150610145602084016100ff565b90509250929050565b608051610887610177600039600081816101cf01528181610552015261061601526108876000f3fe608060405234801561001057600080fd5b50600436106100a95760003560e01c80638da5cb5b116100715780638da5cb5b146101395780639d10f39d1461015e578063ce8a9dc314610171578063e5711ffc14610194578063f2fde38b146101b7578063fc0c546a146101ca57600080fd5b80630530d613146100ae578063216ec722146100e6578063332f6465146100fb578063715018a61461010e5780637c5620de14610116575b600080fd5b6100d16100bc366004610752565b60046020526000908152604090205460ff1681565b60405190151581526020015b60405180910390f35b6100f96100f4366004610787565b6101f1565b005b6100f96101093660046107c0565b610350565b6100f96103e9565b6100d1610124366004610752565b60036020526000908152604090205460ff1681565b6000546001600160a01b03165b6040516001600160a01b0390911681526020016100dd565b6100f961016c3660046107fc565b6103fd565b6100d161017f366004610752565b60026020526000908152604090205460ff1681565b6100d16101a236600461082f565b60016020526000908152604090205460ff1681565b6100f96101c536600461082f565b610507565b6101467f000000000000000000000000000000000000000000000000000000000000000081565b3360009081526001602052604090205460ff166102275760405162a56d5360e61b81523360048201526024015b60405180910390fd5b826000036102485760405163162908e360e11b815260040160405180910390fd5b60008181526004602052604090205460ff161561027b57604051630292616160e31b81526004810182905260240161021e565b60008281526003602052604090205460ff16806102a6575060008281526002602052604090205460ff165b156102c75760405163c532c35d60e01b81526004810183905260240161021e565b60008181526004602090815260408083208054600160ff19918216811790925586855260039093529220805490911690911790556103058484610545565b836001600160a01b031681837f78772174f96ce919cae4f65cc2244446a623c6d9bb70cc6d737c28c93dee9a618660405161034291815260200190565b60405180910390a450505050565b61035861057d565b6001600160a01b03821661038a57604051633283c86d60e21b81526001600160a01b038316600482015260240161021e565b6001600160a01b038216600081815260016020908152604091829020805460ff191685151590811790915591519182527f85ff5d10aa202e69f691155a2050fed648b2d67f85e35d1279510cc434023736910160405180910390a25050565b6103f161057d565b6103fb60006105b9565b565b3360009081526001602052604090205460ff1661042e5760405162a56d5360e61b815233600482015260240161021e565b8160000361044f5760405163162908e360e11b815260040160405180910390fd5b60008181526002602052604090205460ff168061047a575060008181526003602052604090205460ff165b1561049b5760405163c532c35d60e01b81526004810182905260240161021e565b6000818152600260205260409020805460ff191660011790556104be8383610609565b826001600160a01b0316817fd725e36531db02d8d15a3ef474ec75f5120d499c2d11fcae6bb1f481eb0b2028846040516104fa91815260200190565b60405180910390a3505050565b61050f61057d565b6001600160a01b03811661053957604051631e4fbdf760e01b81526000600482015260240161021e565b610542816105b9565b50565b6105796001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016838361063e565b5050565b336105906000546001600160a01b031690565b6001600160a01b0316146103fb5760405163118cdaa760e01b815233600482015260240161021e565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6105796001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000168330846106a2565b6040516001600160a01b0383811660248301526044820183905261069d91859182169063a9059cbb906064015b604051602081830303815290604052915060e01b6020820180516001600160e01b0383818316178352505050506106e1565b505050565b6040516001600160a01b0384811660248301528381166044830152606482018390526106db9186918216906323b872dd9060840161066b565b50505050565b600080602060008451602086016000885af180610704576040513d6000823e3d81fd5b50506000513d9150811561071c578060011415610729565b6001600160a01b0384163b155b156106db57604051635274afe760e01b81526001600160a01b038516600482015260240161021e565b60006020828403121561076457600080fd5b5035919050565b80356001600160a01b038116811461078257600080fd5b919050565b6000806000806080858703121561079d57600080fd5b6107a68561076b565b966020860135965060408601359560600135945092505050565b600080604083850312156107d357600080fd5b6107dc8361076b565b9150602083013580151581146107f157600080fd5b809150509250929050565b60008060006060848603121561081157600080fd5b61081a8461076b565b95602085013595506040909401359392505050565b60006020828403121561084157600080fd5b61084a8261076b565b939250505056fea2646970667358221220035a60b8323d39018de421a572b0ea7468f007cd3346573391786c7963e01eb464736f6c63430008160033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100a95760003560e01c80638da5cb5b116100715780638da5cb5b146101395780639d10f39d1461015e578063ce8a9dc314610171578063e5711ffc14610194578063f2fde38b146101b7578063fc0c546a146101ca57600080fd5b80630530d613146100ae578063216ec722146100e6578063332f6465146100fb578063715018a61461010e5780637c5620de14610116575b600080fd5b6100d16100bc366004610752565b60046020526000908152604090205460ff1681565b60405190151581526020015b60405180910390f35b6100f96100f4366004610787565b6101f1565b005b6100f96101093660046107c0565b610350565b6100f96103e9565b6100d1610124366004610752565b60036020526000908152604090205460ff1681565b6000546001600160a01b03165b6040516001600160a01b0390911681526020016100dd565b6100f961016c3660046107fc565b6103fd565b6100d161017f366004610752565b60026020526000908152604090205460ff1681565b6100d16101a236600461082f565b60016020526000908152604090205460ff1681565b6100f96101c536600461082f565b610507565b6101467f000000000000000000000000000000000000000000000000000000000000000081565b3360009081526001602052604090205460ff166102275760405162a56d5360e61b81523360048201526024015b60405180910390fd5b826000036102485760405163162908e360e11b815260040160405180910390fd5b60008181526004602052604090205460ff161561027b57604051630292616160e31b81526004810182905260240161021e565b60008281526003602052604090205460ff16806102a6575060008281526002602052604090205460ff165b156102c75760405163c532c35d60e01b81526004810183905260240161021e565b60008181526004602090815260408083208054600160ff19918216811790925586855260039093529220805490911690911790556103058484610545565b836001600160a01b031681837f78772174f96ce919cae4f65cc2244446a623c6d9bb70cc6d737c28c93dee9a618660405161034291815260200190565b60405180910390a450505050565b61035861057d565b6001600160a01b03821661038a57604051633283c86d60e21b81526001600160a01b038316600482015260240161021e565b6001600160a01b038216600081815260016020908152604091829020805460ff191685151590811790915591519182527f85ff5d10aa202e69f691155a2050fed648b2d67f85e35d1279510cc434023736910160405180910390a25050565b6103f161057d565b6103fb60006105b9565b565b3360009081526001602052604090205460ff1661042e5760405162a56d5360e61b815233600482015260240161021e565b8160000361044f5760405163162908e360e11b815260040160405180910390fd5b60008181526002602052604090205460ff168061047a575060008181526003602052604090205460ff165b1561049b5760405163c532c35d60e01b81526004810182905260240161021e565b6000818152600260205260409020805460ff191660011790556104be8383610609565b826001600160a01b0316817fd725e36531db02d8d15a3ef474ec75f5120d499c2d11fcae6bb1f481eb0b2028846040516104fa91815260200190565b60405180910390a3505050565b61050f61057d565b6001600160a01b03811661053957604051631e4fbdf760e01b81526000600482015260240161021e565b610542816105b9565b50565b6105796001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016838361063e565b5050565b336105906000546001600160a01b031690565b6001600160a01b0316146103fb5760405163118cdaa760e01b815233600482015260240161021e565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6105796001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000168330846106a2565b6040516001600160a01b0383811660248301526044820183905261069d91859182169063a9059cbb906064015b604051602081830303815290604052915060e01b6020820180516001600160e01b0383818316178352505050506106e1565b505050565b6040516001600160a01b0384811660248301528381166044830152606482018390526106db9186918216906323b872dd9060840161066b565b50505050565b600080602060008451602086016000885af180610704576040513d6000823e3d81fd5b50506000513d9150811561071c578060011415610729565b6001600160a01b0384163b155b156106db57604051635274afe760e01b81526001600160a01b038516600482015260240161021e565b60006020828403121561076457600080fd5b5035919050565b80356001600160a01b038116811461078257600080fd5b919050565b6000806000806080858703121561079d57600080fd5b6107a68561076b565b966020860135965060408601359560600135945092505050565b600080604083850312156107d357600080fd5b6107dc8361076b565b9150602083013580151581146107f157600080fd5b809150509250929050565b60008060006060848603121561081157600080fd5b61081a8461076b565b95602085013595506040909401359392505050565b60006020828403121561084157600080fd5b61084a8261076b565b939250505056fea2646970667358221220035a60b8323d39018de421a572b0ea7468f007cd3346573391786c7963e01eb464736f6c63430008160033",
+  "devdoc": {
+    "errors": {
+      "InvalidAdapter(address)": [
+        {
+          "params": {
+            "adapter": "Invalid adapter address."
+          }
+        }
+      ],
+      "InvalidToken(address)": [
+        {
+          "params": {
+            "token": "Invalid token address."
+          }
+        }
+      ],
+      "OnlyAdapter(address)": [
+        {
+          "params": {
+            "caller": "Unauthorized caller address."
+          }
+        }
+      ],
+      "OwnableInvalidOwner(address)": [
+        {
+          "details": "The owner is not a valid owner account. (eg. `address(0)`)"
+        }
+      ],
+      "OwnableUnauthorizedAccount(address)": [
+        {
+          "details": "The caller account is not authorized to perform an operation."
+        }
+      ],
+      "SafeERC20FailedOperation(address)": [
+        {
+          "details": "An operation with an ERC-20 token failed."
+        }
+      ],
+      "TransferReplay(bytes32)": [
+        {
+          "params": {
+            "transferId": "Replayed transfer identifier."
+          }
+        }
+      ],
+      "TransportReplay(bytes32)": [
+        {
+          "params": {
+            "transportId": "Replayed transport identifier."
+          }
+        }
+      ]
+    },
+    "events": {
+      "AdapterSet(address,bool)": {
+        "params": {
+          "adapter": "Adapter address.",
+          "enabled": "Whether the adapter is enabled."
+        }
+      },
+      "BridgeIn(bytes32,bytes32,address,uint256)": {
+        "params": {
+          "amount": "Bridged token amount.",
+          "to": "Recipient address on this chain.",
+          "transferId": "Cross-chain transfer identifier.",
+          "transportId": "Transport-level message identifier."
+        }
+      },
+      "BridgeOut(bytes32,address,uint256)": {
+        "params": {
+          "amount": "Bridged token amount.",
+          "from": "Source address on this chain.",
+          "transferId": "Cross-chain transfer identifier."
+        }
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "bridgeIn(address,uint256,bytes32,bytes32)": {
+        "params": {
+          "_amount": "Token amount bridged in.",
+          "_to": "Recipient of bridged tokens.",
+          "_transferId": "Cross-chain transfer identifier.",
+          "_transportId": "Transport-level message identifier."
+        }
+      },
+      "bridgeOut(address,uint256,bytes32)": {
+        "params": {
+          "_amount": "Token amount bridged out.",
+          "_from": "Address whose tokens are bridged out.",
+          "_transferId": "Cross-chain transfer identifier."
+        }
+      },
+      "constructor": {
+        "params": {
+          "_owner": "Owner allowed to manage adapters.",
+          "_token": "Canonical ERC20 token address."
+        }
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+      },
+      "setAdapter(address,bool)": {
+        "params": {
+          "_adapter": "Adapter address to update.",
+          "_enabled": "Whether the adapter is authorized."
+        }
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      }
+    },
+    "stateVariables": {
+      "token": {
+        "return": "Canonical token address.",
+        "returns": {
+          "_0": "Canonical token address."
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "errors": {
+      "InvalidAdapter(address)": [
+        {
+          "notice": "Thrown when attempting to configure a zero adapter address."
+        }
+      ],
+      "InvalidAmount()": [
+        {
+          "notice": "Thrown when the bridged amount is zero."
+        }
+      ],
+      "InvalidToken(address)": [
+        {
+          "notice": "Thrown when deploying with a zero canonical token address."
+        }
+      ],
+      "OnlyAdapter(address)": [
+        {
+          "notice": "Thrown when a caller is not an authorized bridge adapter."
+        }
+      ],
+      "TransferReplay(bytes32)": [
+        {
+          "notice": "Thrown when a transfer identifier has already been consumed."
+        }
+      ],
+      "TransportReplay(bytes32)": [
+        {
+          "notice": "Thrown when a transport identifier has already been consumed."
+        }
+      ]
+    },
+    "events": {
+      "AdapterSet(address,bool)": {
+        "notice": "Emitted when an adapter authorization is updated."
+      },
+      "BridgeIn(bytes32,bytes32,address,uint256)": {
+        "notice": "Emitted when an inbound bridge operation is processed."
+      },
+      "BridgeOut(bytes32,address,uint256)": {
+        "notice": "Emitted when an outbound bridge operation is processed."
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "adapters(address)": {
+        "notice": "Returns whether an adapter is authorized to call bridge methods."
+      },
+      "bridgeIn(address,uint256,bytes32,bytes32)": {
+        "notice": "Processes inbound bridge flow and marks transfer and transport ids as consumed."
+      },
+      "bridgeOut(address,uint256,bytes32)": {
+        "notice": "Processes outbound bridge flow and marks transfer id as consumed."
+      },
+      "constructor": {
+        "notice": "Initializes canonical bridge core for an existing ERC20 token."
+      },
+      "inboundTransfers(bytes32)": {
+        "notice": "Returns whether an inbound transfer identifier has been consumed."
+      },
+      "inboundTransportIds(bytes32)": {
+        "notice": "Returns whether an inbound transport identifier has been consumed."
+      },
+      "outboundTransfers(bytes32)": {
+        "notice": "Returns whether an outbound transfer identifier has been consumed."
+      },
+      "setAdapter(address,bool)": {
+        "notice": "Enables or disables an adapter."
+      },
+      "token()": {
+        "notice": "Returns the canonical ERC20 token locked by this core."
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 1581,
+        "contract": "contracts/Token6022BridgeCoreCanonical.sol:Token6022BridgeCoreCanonical",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 3088,
+        "contract": "contracts/Token6022BridgeCoreCanonical.sol:Token6022BridgeCoreCanonical",
+        "label": "adapters",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_address,t_bool)"
+      },
+      {
+        "astId": 3092,
+        "contract": "contracts/Token6022BridgeCoreCanonical.sol:Token6022BridgeCoreCanonical",
+        "label": "outboundTransfers",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_mapping(t_bytes32,t_bool)"
+      },
+      {
+        "astId": 3096,
+        "contract": "contracts/Token6022BridgeCoreCanonical.sol:Token6022BridgeCoreCanonical",
+        "label": "inboundTransfers",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_mapping(t_bytes32,t_bool)"
+      },
+      {
+        "astId": 3100,
+        "contract": "contracts/Token6022BridgeCoreCanonical.sol:Token6022BridgeCoreCanonical",
+        "label": "inboundTransportIds",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_mapping(t_bytes32,t_bool)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_mapping(t_bytes32,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      }
+    }
+  }
+}
