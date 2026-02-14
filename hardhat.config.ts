@@ -6,16 +6,14 @@ import "hardhat-contract-sizer";
 import "@nomiclabs/hardhat-ethers";
 import "@layerzerolabs/toolbox-hardhat";
 import "@nomicfoundation/hardhat-chai-matchers";
-import {
-  HardhatUserConfig,
-} from "hardhat/types";
+import { HardhatUserConfig } from "hardhat/types";
 
 import { EndpointId } from "@layerzerolabs/lz-definitions";
 
 import "./type-extensions";
-import './tasks/ccip-wire';
-import './tasks/bridge-send';
-import './tasks/lz-wire';
+import "./tasks/ccip-wire";
+import "./tasks/bridge-send";
+import "./tasks/lz-wire";
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const CCIP_ROUTER_AMOY_TESTNET = process.env.CCIP_ROUTER_AMOY_TESTNET;
@@ -35,7 +33,7 @@ const account: string = PRIVATE_KEY ?? "";
 
 if (account == "") {
   console.warn(
-    "Could not find PRIVATE_KEY environment variables. It will not be possible to execute transactions in your example."
+    "Could not find PRIVATE_KEY environment variables. It will not be possible to execute transactions in your example.",
   );
 }
 
@@ -93,8 +91,6 @@ const config: HardhatUserConfig = {
       accounts: [account],
       bridgeCore: {
         type: "satellite",
-        tokenName: "6022",
-        tokenSymbol: "6022",
       },
       bridgeAdapters: {
         lz: {},
@@ -116,15 +112,14 @@ const config: HardhatUserConfig = {
     },
     "citrea-testnet": {
       eid: EndpointId.CITREA_V2_TESTNET,
-      url: process.env.RPC_URL_CITREA_TESTNET || "https://rpc.testnet.citrea.xyz",
+      url:
+        process.env.RPC_URL_CITREA_TESTNET || "https://rpc.testnet.citrea.xyz",
       accounts: [account],
       ...(CCIP_CHAIN_SELECTOR_CITREA_TESTNET
         ? { ccipChainSelector: CCIP_CHAIN_SELECTOR_CITREA_TESTNET }
         : {}),
       bridgeCore: {
         type: "satellite",
-        tokenName: "6022",
-        tokenSymbol: "6022",
       },
       bridgeAdapters: {
         lz: {},
