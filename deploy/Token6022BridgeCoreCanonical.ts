@@ -39,6 +39,7 @@ const deploy: DeployFunction = async (hre) => {
     args: [tokenAddress, owner],
     log: true,
     skipIfAlreadyDeployed: true,
+    waitConfirmations: 2,
   });
 
   console.log(`\n✅ ${contractName} deployed successfully!`);

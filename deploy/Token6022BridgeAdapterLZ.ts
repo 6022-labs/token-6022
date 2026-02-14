@@ -43,6 +43,7 @@ const deploy: DeployFunction = async (hre) => {
     args: [coreDeployment.address, lzEndpoint],
     log: true,
     skipIfAlreadyDeployed: true,
+    waitConfirmations: 2,
   });
 
   console.log(`\n🔐 Checking adapter authorization...`);
@@ -55,7 +56,7 @@ const deploy: DeployFunction = async (hre) => {
       console.log(`🔓 Auto-authorizing adapter on core...`);
       await execute(
         coreName,
-        { from: deployer, log: true },
+        { from: deployer, log: true, waitConfirmations: 2 },
         "setAdapter",
         address,
         true,
