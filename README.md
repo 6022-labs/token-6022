@@ -95,6 +95,16 @@ npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
 Adapter deploy scripts automatically authorize the deployed adapter on the local core via `setAdapter(adapter, true)`.
 When `bridgeGovernance.owner` is different from the deployer (for example a Safe), auto-authorization is skipped and must be executed by the configured owner.
 
+#### Replacing an adapter without redeploying core
+
+- Avoid `--reset` for adapter replacement: it reruns dependency scripts and can rerun core deployments.
+- Replace adapter-only by removing the adapter deployment record, then deploying only that tag:
+
+```bash
+rm deployments/base-testnet/Token6022BridgeAdapterCCIP.json
+npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
+```
+
 ### 3) Wire LayerZero (optional)
 
 - Topology is configured in `layerzero.testnet.config.ts`.

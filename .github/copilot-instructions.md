@@ -23,6 +23,7 @@
 - Network config carries bridgeCore/bridgeAdapters settings used by deploy scripts; see [hardhat.config.ts](hardhat.config.ts).
 - Deploy scripts use hardhat-deploy tags and may skip token deploy when tokenAddress is configured; see [deploy/Token6022.ts](deploy/Token6022.ts).
 - Adapter deploys auto-authorize on the core via setAdapter; see [deploy/Token6022BridgeAdapterCCIP.ts](deploy/Token6022BridgeAdapterCCIP.ts) and [deploy/Token6022BridgeAdapterLZ.ts](deploy/Token6022BridgeAdapterLZ.ts).
+- For adapter-only replacement, do not use `--reset` (it reruns dependencies); remove only the adapter deployment file and redeploy that adapter tag.
 - Wiring tasks read root config files and apply idempotent peer/args updates; see [tasks/ccip-wire.ts](tasks/ccip-wire.ts) and [tasks/lz-wire.ts](tasks/lz-wire.ts).
 - Bridge send task normalizes transfer IDs and handles approvals on canonical chains; see [tasks/bridge-send.ts](tasks/bridge-send.ts).
 
