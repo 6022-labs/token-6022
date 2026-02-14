@@ -16,6 +16,8 @@ interface LzWireArgs {
     dryRun: boolean
 }
 
+const REQUIRED_CONFIRMATIONS = 2
+
 const LZ_CONFIGURABLE_ABI = [
     'function peers(uint32 eid) view returns (bytes32 peer)',
     'function lzSendOptions(uint32 eid) view returns (bytes options)',
@@ -101,7 +103,7 @@ async function configureConnection(
             console.log(`🎯 EID: ${connection.to.eid}`)
             console.log(`🤝 Peer: ${remotePeer}`)
             const tx = await contract.setPeer(connection.to.eid, remotePeer)
-            await tx.wait()
+            await tx.wait(REQUIRED_CONFIRMATIONS)
             console.log(`✅ Peer configured!`)
             console.log(`📝 Tx: ${tx.hash}`)
         }
@@ -125,7 +127,7 @@ async function configureConnection(
                 console.log(`🎯 EID: ${connection.to.eid}`)
                 console.log(`⚙️  Options: ${desiredOptions}`)
                 const tx = await contract.setLzSendOptions(connection.to.eid, desiredOptions)
-                await tx.wait()
+                await tx.wait(REQUIRED_CONFIRMATIONS)
                 console.log(`✅ Options configured!`)
                 console.log(`📝 Tx: ${tx.hash}`)
             }

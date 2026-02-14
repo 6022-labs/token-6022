@@ -36,6 +36,8 @@ interface MeshPoint {
   address?: string;
 }
 
+const REQUIRED_CONFIRMATIONS = 2;
+
 async function resolveAdapterAddress(
   adapter: string,
   hre: HardhatRuntimeEnvironment,
@@ -182,7 +184,7 @@ async function resolveAmountAndApproveIfNeeded(
       console.log(`🔀 Spender: ${coreAddress}`);
       console.log(`💰 Amount: ${amountLD.toString()}`);
       const approvalTx = await asset.approve(coreAddress, amountLD);
-      await approvalTx.wait();
+      await approvalTx.wait(REQUIRED_CONFIRMATIONS);
       console.log(`✅ Approval confirmed!`);
       console.log(`📝 Tx: ${approvalTx.hash}`);
     }
@@ -461,7 +463,7 @@ task("lz:send", "Sends a bridge transfer through Token6022BridgeAdapterLZ")
         value: nativeFee,
       },
     );
-    const receipt = await tx.wait();
+    const receipt = await tx.wait(REQUIRED_CONFIRMATIONS);
     const guid = findEventArg(receipt, "LzSend", "guid");
 
     console.log(`\n✅ Bridge transaction sent successfully!`);
@@ -568,7 +570,7 @@ task("ccip:send", "Sends a bridge transfer through Token6022BridgeAdapterCCIP")
         value: quotedFee,
       },
     );
-    const receipt = await tx.wait();
+    const receipt = await tx.wait(REQUIRED_CONFIRMATIONS);
     const messageId = findEventArg(receipt, "CcipSend", "messageId");
 
     console.log(`\n✅ Bridge transaction sent successfully!`);

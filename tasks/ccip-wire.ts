@@ -17,6 +17,8 @@ interface CcipWireArgs {
     dryRun: boolean
 }
 
+const REQUIRED_CONFIRMATIONS = 2
+
 const CCIP_CONFIGURABLE_ABI = [
     'function ccipPeers(uint64 chainSelector) view returns (bytes peer)',
     'function ccipExtraArgs(uint64 chainSelector) view returns (bytes extraArgs)',
@@ -107,7 +109,7 @@ async function configureConnection(
             console.log(`🎯 Selector: ${destinationChainSelector}`)
             console.log(`🤝 Peer: ${remotePeer}`)
             const tx = await contract.setCcipPeer(destinationChainSelector, remotePeer)
-            await tx.wait()
+            await tx.wait(REQUIRED_CONFIRMATIONS)
             console.log(`✅ Peer configured!`)
             console.log(`📝 Tx: ${tx.hash}`)
         }
@@ -131,7 +133,7 @@ async function configureConnection(
                 console.log(`🎯 Selector: ${destinationChainSelector}`)
                 console.log(`⚙️  Extra Args: ${desiredExtraArgs}`)
                 const tx = await contract.setCcipExtraArgs(destinationChainSelector, desiredExtraArgs)
-                await tx.wait()
+                await tx.wait(REQUIRED_CONFIRMATIONS)
                 console.log(`✅ Extra args configured!`)
                 console.log(`📝 Tx: ${tx.hash}`)
             }
