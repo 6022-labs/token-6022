@@ -1,0 +1,842 @@
+{
+  "address": "0x806f7DA2DC5ef8a689f2bee8E9a66E7A216E2c97",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_core",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_ccipRouter",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "chainSelector",
+          "type": "uint64"
+        },
+        {
+          "internalType": "bytes",
+          "name": "sender",
+          "type": "bytes"
+        }
+      ],
+      "name": "InvalidCcipPeer",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "core",
+          "type": "address"
+        }
+      ],
+      "name": "InvalidCore",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "supplied",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "required",
+          "type": "uint256"
+        }
+      ],
+      "name": "InvalidNativeFee",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        }
+      ],
+      "name": "InvalidRecipient",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "router",
+          "type": "address"
+        }
+      ],
+      "name": "InvalidRouter",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "chainSelector",
+          "type": "uint64"
+        }
+      ],
+      "name": "MissingCcipPeer",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "NativeRefundFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "caller",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "expectedOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OnlyCoreOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenCount",
+          "type": "uint256"
+        }
+      ],
+      "name": "UnsupportedCcipTokenPayload",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint64",
+          "name": "chainSelector",
+          "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "extraArgs",
+          "type": "bytes"
+        }
+      ],
+      "name": "CcipExtraArgsSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint64",
+          "name": "chainSelector",
+          "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "peer",
+          "type": "bytes"
+        }
+      ],
+      "name": "CcipPeerSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint64",
+          "name": "srcChainSelector",
+          "type": "uint64"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "messageId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "transferId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "CcipReceive",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint64",
+          "name": "dstChainSelector",
+          "type": "uint64"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "messageId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "transferId",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "CcipSend",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "chainSelector",
+          "type": "uint64"
+        }
+      ],
+      "name": "ccipExtraArgs",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "extraArgs",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "chainSelector",
+          "type": "uint64"
+        }
+      ],
+      "name": "ccipPeers",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "peer",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "messageId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "sourceChainSelector",
+              "type": "uint64"
+            },
+            {
+              "internalType": "bytes",
+              "name": "sender",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "amount",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Client.EVMTokenAmount[]",
+              "name": "destTokenAmounts",
+              "type": "tuple[]"
+            }
+          ],
+          "internalType": "struct Client.Any2EVMMessage",
+          "name": "message",
+          "type": "tuple"
+        }
+      ],
+      "name": "ccipReceive",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "core",
+      "outputs": [
+        {
+          "internalType": "contract IToken6022BridgeCore",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getRouter",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "_dstChainSelector",
+          "type": "uint64"
+        },
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_userTransferId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "quoteCcipSend",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "fee",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "_dstChainSelector",
+          "type": "uint64"
+        },
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_userTransferId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "sendWithCcip",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "messageId",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "_chainSelector",
+          "type": "uint64"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_extraArgs",
+          "type": "bytes"
+        }
+      ],
+      "name": "setCcipExtraArgs",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint64",
+          "name": "_chainSelector",
+          "type": "uint64"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_peer",
+          "type": "bytes"
+        }
+      ],
+      "name": "setCcipPeer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "interfaceId",
+          "type": "bytes4"
+        }
+      ],
+      "name": "supportsInterface",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x0c70833a0f0ff538b716249ea27516b152f0cf4755de089a8d0aa565fd010abc",
+  "receipt": {
+    "to": null,
+    "from": "0x4bca9E17a8326d283d1fC68A725B46b42c2D9146",
+    "contractAddress": "0x806f7DA2DC5ef8a689f2bee8E9a66E7A216E2c97",
+    "transactionIndex": 15,
+    "gasUsed": "1290313",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xdd75b456dd33c3e50f1cdf6f4340e40a632d4f42fb1b6d55ea36cafa85c49729",
+    "transactionHash": "0x0c70833a0f0ff538b716249ea27516b152f0cf4755de089a8d0aa565fd010abc",
+    "logs": [],
+    "blockNumber": 37659122,
+    "cumulativeGasUsed": "13180501",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0xc8183a40deDD4537aC106cc5dd87A2356b03c6c2",
+    "0xD3b06cEbF099CE7DA4AcCf578aaebFDBd6e88a93"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "62a92f90958d54d25541aa27a51d82cd",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.22+commit.4fc1097e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_core\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_ccipRouter\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"chainSelector\",\"type\":\"uint64\"},{\"internalType\":\"bytes\",\"name\":\"sender\",\"type\":\"bytes\"}],\"name\":\"InvalidCcipPeer\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"core\",\"type\":\"address\"}],\"name\":\"InvalidCore\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"supplied\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"required\",\"type\":\"uint256\"}],\"name\":\"InvalidNativeFee\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"}],\"name\":\"InvalidRecipient\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"router\",\"type\":\"address\"}],\"name\":\"InvalidRouter\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"chainSelector\",\"type\":\"uint64\"}],\"name\":\"MissingCcipPeer\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"NativeRefundFailed\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"expectedOwner\",\"type\":\"address\"}],\"name\":\"OnlyCoreOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenCount\",\"type\":\"uint256\"}],\"name\":\"UnsupportedCcipTokenPayload\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"chainSelector\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"extraArgs\",\"type\":\"bytes\"}],\"name\":\"CcipExtraArgsSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"chainSelector\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"peer\",\"type\":\"bytes\"}],\"name\":\"CcipPeerSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"srcChainSelector\",\"type\":\"uint64\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"messageId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"transferId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"CcipReceive\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint64\",\"name\":\"dstChainSelector\",\"type\":\"uint64\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"messageId\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"transferId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"CcipSend\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"chainSelector\",\"type\":\"uint64\"}],\"name\":\"ccipExtraArgs\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"extraArgs\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"chainSelector\",\"type\":\"uint64\"}],\"name\":\"ccipPeers\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"peer\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"bytes32\",\"name\":\"messageId\",\"type\":\"bytes32\"},{\"internalType\":\"uint64\",\"name\":\"sourceChainSelector\",\"type\":\"uint64\"},{\"internalType\":\"bytes\",\"name\":\"sender\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct Client.EVMTokenAmount[]\",\"name\":\"destTokenAmounts\",\"type\":\"tuple[]\"}],\"internalType\":\"struct Client.Any2EVMMessage\",\"name\":\"message\",\"type\":\"tuple\"}],\"name\":\"ccipReceive\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"core\",\"outputs\":[{\"internalType\":\"contract IToken6022BridgeCore\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getRouter\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"_dstChainSelector\",\"type\":\"uint64\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_userTransferId\",\"type\":\"bytes32\"}],\"name\":\"quoteCcipSend\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"fee\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"_dstChainSelector\",\"type\":\"uint64\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_userTransferId\",\"type\":\"bytes32\"}],\"name\":\"sendWithCcip\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"messageId\",\"type\":\"bytes32\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"_chainSelector\",\"type\":\"uint64\"},{\"internalType\":\"bytes\",\"name\":\"_extraArgs\",\"type\":\"bytes\"}],\"name\":\"setCcipExtraArgs\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"_chainSelector\",\"type\":\"uint64\"},{\"internalType\":\"bytes\",\"name\":\"_peer\",\"type\":\"bytes\"}],\"name\":\"setCcipPeer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"errors\":{\"InvalidCcipPeer(uint64,bytes)\":[{\"params\":{\"chainSelector\":\"Source CCIP chain selector.\",\"sender\":\"Raw CCIP sender bytes from the message.\"}}],\"InvalidCore(address)\":[{\"params\":{\"core\":\"Invalid core address.\"}}],\"InvalidNativeFee(uint256,uint256)\":[{\"params\":{\"required\":\"Required native fee.\",\"supplied\":\"Native value provided by caller.\"}}],\"InvalidRecipient(address)\":[{\"params\":{\"recipient\":\"Invalid recipient address.\"}}],\"MissingCcipPeer(uint64)\":[{\"params\":{\"chainSelector\":\"Destination CCIP chain selector.\"}}],\"NativeRefundFailed(address,uint256)\":[{\"params\":{\"amount\":\"Refund amount.\",\"recipient\":\"Refund recipient.\"}}],\"OnlyCoreOwner(address,address)\":[{\"params\":{\"caller\":\"Unauthorized caller.\",\"expectedOwner\":\"Current bridge core owner.\"}}],\"UnsupportedCcipTokenPayload(uint256)\":[{\"params\":{\"tokenCount\":\"Number of token entries in the payload.\"}}]},\"events\":{\"CcipExtraArgsSet(uint64,bytes)\":{\"params\":{\"chainSelector\":\"CCIP chain selector.\",\"extraArgs\":\"Encoded CCIP execution options.\"}},\"CcipPeerSet(uint64,bytes)\":{\"params\":{\"chainSelector\":\"CCIP chain selector.\",\"peer\":\"Trusted remote adapter identifier bytes.\"}},\"CcipReceive(uint64,bytes32,bytes32,address,uint256)\":{\"params\":{\"amount\":\"Bridged token amount.\",\"messageId\":\"CCIP message identifier.\",\"srcChainSelector\":\"Source CCIP chain selector.\",\"to\":\"Destination recipient address on this chain.\",\"transferId\":\"Cross-chain transfer identifier.\"}},\"CcipSend(uint64,bytes32,bytes32,address,address,uint256)\":{\"params\":{\"amount\":\"Bridged token amount.\",\"dstChainSelector\":\"Destination CCIP chain selector.\",\"from\":\"Source address on this chain.\",\"messageId\":\"CCIP message identifier.\",\"to\":\"Destination recipient address.\",\"transferId\":\"Cross-chain transfer identifier.\"}}},\"kind\":\"dev\",\"methods\":{\"ccipReceive((bytes32,uint64,bytes,bytes,(address,uint256)[]))\":{\"details\":\"Note ensure you check the msg.sender is the OffRampRouter\",\"params\":{\"message\":\"CCIP Message\"}},\"constructor\":{\"params\":{\"_ccipRouter\":\"Chainlink CCIP router address.\",\"_core\":\"Bridge core contract.\"}},\"getRouter()\":{\"returns\":{\"_0\":\"i_router address\"}},\"quoteCcipSend(uint64,address,uint256,bytes32)\":{\"params\":{\"_amount\":\"Token amount to bridge.\",\"_dstChainSelector\":\"Destination CCIP chain selector.\",\"_to\":\"Recipient on destination chain.\",\"_userTransferId\":\"User-provided transfer identifier entropy.\"},\"returns\":{\"fee\":\"Required native fee.\"}},\"sendWithCcip(uint64,address,uint256,bytes32)\":{\"params\":{\"_amount\":\"Token amount to bridge.\",\"_dstChainSelector\":\"Destination CCIP chain selector.\",\"_to\":\"Recipient on destination chain.\",\"_userTransferId\":\"User-provided transfer identifier entropy.\"},\"returns\":{\"messageId\":\"CCIP message identifier.\"}},\"setCcipExtraArgs(uint64,bytes)\":{\"params\":{\"_chainSelector\":\"CCIP destination chain selector.\",\"_extraArgs\":\"Encoded CCIP execution options.\"}},\"setCcipPeer(uint64,bytes)\":{\"params\":{\"_chainSelector\":\"CCIP chain selector.\",\"_peer\":\"Trusted remote adapter.\"}},\"supportsInterface(bytes4)\":{\"params\":{\"interfaceId\":\"The interfaceId to check\"},\"returns\":{\"_0\":\"true if the interfaceId is supported\"}}},\"stateVariables\":{\"ccipExtraArgs\":{\"params\":{\"chainSelector\":\"CCIP chain selector.\"},\"return\":\"extraArgs Encoded CCIP execution options.\",\"returns\":{\"extraArgs\":\"Encoded CCIP execution options.\"}},\"ccipPeers\":{\"params\":{\"chainSelector\":\"CCIP chain selector.\"},\"return\":\"peer Trusted remote adapter identifier bytes.\",\"returns\":{\"peer\":\"Trusted remote adapter identifier bytes.\"}},\"core\":{\"return\":\"Bridge core contract.\",\"returns\":{\"_0\":\"Bridge core contract.\"}}},\"version\":1},\"userdoc\":{\"errors\":{\"InvalidCcipPeer(uint64,bytes)\":[{\"notice\":\"Thrown when an inbound message sender does not match configured peer.\"}],\"InvalidCore(address)\":[{\"notice\":\"Thrown when deploying with a zero core address.\"}],\"InvalidNativeFee(uint256,uint256)\":[{\"notice\":\"Thrown when supplied native fee is below required fee.\"}],\"InvalidRecipient(address)\":[{\"notice\":\"Thrown when destination recipient is invalid.\"}],\"MissingCcipPeer(uint64)\":[{\"notice\":\"Thrown when no trusted remote CCIP peer is configured for destination chain.\"}],\"NativeRefundFailed(address,uint256)\":[{\"notice\":\"Thrown when refunding excess native fee to caller fails.\"}],\"OnlyCoreOwner(address,address)\":[{\"notice\":\"Thrown when caller is not the current core owner.\"}],\"UnsupportedCcipTokenPayload(uint256)\":[{\"notice\":\"Thrown when inbound CCIP message unexpectedly carries token amounts.\"}]},\"events\":{\"CcipExtraArgsSet(uint64,bytes)\":{\"notice\":\"Emitted when CCIP extra arguments are configured for a chain selector.\"},\"CcipPeerSet(uint64,bytes)\":{\"notice\":\"Emitted when trusted CCIP peer is configured for a chain selector.\"},\"CcipReceive(uint64,bytes32,bytes32,address,uint256)\":{\"notice\":\"Emitted when an inbound CCIP message is accepted and bridged in.\"},\"CcipSend(uint64,bytes32,bytes32,address,address,uint256)\":{\"notice\":\"Emitted when an outbound CCIP bridge message is sent.\"}},\"kind\":\"user\",\"methods\":{\"ccipExtraArgs(uint64)\":{\"notice\":\"Returns CCIP extra arguments configured for destination chain selector.\"},\"ccipPeers(uint64)\":{\"notice\":\"Returns the trusted remote adapter for a CCIP chain selector.\"},\"ccipReceive((bytes32,uint64,bytes,bytes,(address,uint256)[]))\":{\"notice\":\"Called by the Router to deliver a message. If this reverts, any token transfers also revert. The message will move to a FAILED state and become available for manual execution.\"},\"constructor\":{\"notice\":\"Initializes a CCIP bridge adapter.\"},\"core()\":{\"notice\":\"Returns the bridge core managed by this adapter.\"},\"getRouter()\":{\"notice\":\"Return the current router\"},\"quoteCcipSend(uint64,address,uint256,bytes32)\":{\"notice\":\"Quotes native fee required to send a bridge message through CCIP.\"},\"sendWithCcip(uint64,address,uint256,bytes32)\":{\"notice\":\"Bridges tokens through CCIP to the configured remote peer.\"},\"setCcipExtraArgs(uint64,bytes)\":{\"notice\":\"Sets CCIP extra arguments for a destination chain selector.\"},\"setCcipPeer(uint64,bytes)\":{\"notice\":\"Sets the trusted remote CCIP adapter for a chain selector.\"},\"supportsInterface(bytes4)\":{\"notice\":\"IERC165 supports an interfaceId\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/adapters/Token6022BridgeAdapterCCIP.sol\":\"Token6022BridgeAdapterCCIP\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nimport {IAny2EVMMessageReceiver} from \\\"../interfaces/IAny2EVMMessageReceiver.sol\\\";\\n\\nimport {Client} from \\\"../libraries/Client.sol\\\";\\n\\nimport {IERC165} from \\\"../../vendor/openzeppelin-solidity/v4.8.0/utils/introspection/IERC165.sol\\\";\\n\\n/// @title CCIPReceiver - Base contract for CCIP applications that can receive messages.\\nabstract contract CCIPReceiver is IAny2EVMMessageReceiver, IERC165 {\\n  address internal immutable i_router;\\n\\n  constructor(address router) {\\n    if (router == address(0)) revert InvalidRouter(address(0));\\n    i_router = router;\\n  }\\n\\n  /// @notice IERC165 supports an interfaceId\\n  /// @param interfaceId The interfaceId to check\\n  /// @return true if the interfaceId is supported\\n  function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {\\n    return interfaceId == type(IAny2EVMMessageReceiver).interfaceId || interfaceId == type(IERC165).interfaceId;\\n  }\\n\\n  /// @inheritdoc IAny2EVMMessageReceiver\\n  function ccipReceive(Client.Any2EVMMessage calldata message) external virtual override onlyRouter {\\n    _ccipReceive(message);\\n  }\\n\\n  /// @notice Override this function in your implementation.\\n  /// @param message Any2EVMMessage\\n  function _ccipReceive(Client.Any2EVMMessage memory message) internal virtual;\\n\\n  /////////////////////////////////////////////////////////////////////\\n  // Plumbing\\n  /////////////////////////////////////////////////////////////////////\\n\\n  /// @notice Return the current router\\n  /// @return i_router address\\n  function getRouter() public view returns (address) {\\n    return address(i_router);\\n  }\\n\\n  error InvalidRouter(address router);\\n\\n  /// @dev only calls from the set router are accepted.\\n  modifier onlyRouter() {\\n    if (msg.sender != address(i_router)) revert InvalidRouter(msg.sender);\\n    _;\\n  }\\n}\\n\",\"keccak256\":\"0xcf5d0a5cd6ed0f6a9ed721b3e532c0504ed1ba3ab6d3567165876ceb4f23b084\",\"license\":\"MIT\"},\"@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IAny2EVMMessageReceiver.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nimport {Client} from \\\"../libraries/Client.sol\\\";\\n\\n/// @notice Application contracts that intend to receive messages from\\n/// the router should implement this interface.\\ninterface IAny2EVMMessageReceiver {\\n  /// @notice Called by the Router to deliver a message.\\n  /// If this reverts, any token transfers also revert. The message\\n  /// will move to a FAILED state and become available for manual execution.\\n  /// @param message CCIP Message\\n  /// @dev Note ensure you check the msg.sender is the OffRampRouter\\n  function ccipReceive(Client.Any2EVMMessage calldata message) external;\\n}\\n\",\"keccak256\":\"0xd2a05a4f58a453cbf8cfa6aa78f58cb8e42091b3a025f711a0aa51f584e16b48\",\"license\":\"MIT\"},\"@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\nimport {Client} from \\\"../libraries/Client.sol\\\";\\n\\ninterface IRouterClient {\\n  error UnsupportedDestinationChain(uint64 destChainSelector);\\n  error InsufficientFeeTokenAmount();\\n  error InvalidMsgValue();\\n\\n  /// @notice Checks if the given chain ID is supported for sending/receiving.\\n  /// @param chainSelector The chain to check.\\n  /// @return supported is true if it is supported, false if not.\\n  function isChainSupported(uint64 chainSelector) external view returns (bool supported);\\n\\n  /// @notice Gets a list of all supported tokens which can be sent or received\\n  /// to/from a given chain id.\\n  /// @param chainSelector The chainSelector.\\n  /// @return tokens The addresses of all tokens that are supported.\\n  function getSupportedTokens(uint64 chainSelector) external view returns (address[] memory tokens);\\n\\n  /// @param destinationChainSelector The destination chainSelector\\n  /// @param message The cross-chain CCIP message including data and/or tokens\\n  /// @return fee returns guaranteed execution fee for the specified message\\n  /// delivery to destination chain\\n  /// @dev returns 0 fee on invalid message.\\n  function getFee(\\n    uint64 destinationChainSelector,\\n    Client.EVM2AnyMessage memory message\\n  ) external view returns (uint256 fee);\\n\\n  /// @notice Request a message to be sent to the destination chain\\n  /// @param destinationChainSelector The destination chain ID\\n  /// @param message The cross-chain CCIP message including data and/or tokens\\n  /// @return messageId The message ID\\n  /// @dev Note if msg.value is larger than the required fee (from getFee) we accept\\n  /// the overpayment with no refund.\\n  function ccipSend(\\n    uint64 destinationChainSelector,\\n    Client.EVM2AnyMessage calldata message\\n  ) external payable returns (bytes32);\\n}\\n\",\"keccak256\":\"0x9899fab6a40f68408ddf153612c553f2441ea27770176bf71ccce22c40393286\",\"license\":\"MIT\"},\"@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.0;\\n\\n// End consumer library.\\nlibrary Client {\\n  struct EVMTokenAmount {\\n    address token; // token address on the local chain.\\n    uint256 amount; // Amount of tokens.\\n  }\\n\\n  struct Any2EVMMessage {\\n    bytes32 messageId; // MessageId corresponding to ccipSend on source.\\n    uint64 sourceChainSelector; // Source chain selector.\\n    bytes sender; // abi.decode(sender) if coming from an EVM chain.\\n    bytes data; // payload sent in original message.\\n    EVMTokenAmount[] destTokenAmounts; // Tokens and their amounts in their destination chain representation.\\n  }\\n\\n  // If extraArgs is empty bytes, the default is 200k gas limit and strict = false.\\n  struct EVM2AnyMessage {\\n    bytes receiver; // abi.encode(receiver address) for dest EVM chains\\n    bytes data; // Data payload\\n    EVMTokenAmount[] tokenAmounts; // Token transfers\\n    address feeToken; // Address of feeToken. address(0) means you will send msg.value.\\n    bytes extraArgs; // Populate this with _argsToBytes(EVMExtraArgsV1)\\n  }\\n\\n  // extraArgs will evolve to support new features\\n  // bytes4(keccak256(\\\"CCIP EVMExtraArgsV1\\\"));\\n  bytes4 public constant EVM_EXTRA_ARGS_V1_TAG = 0x97a657c9;\\n  struct EVMExtraArgsV1 {\\n    uint256 gasLimit; // ATTENTION!!! MAX GAS LIMIT 4M FOR BETA TESTING\\n    bool strict; // See strict sequencing details below.\\n  }\\n\\n  function _argsToBytes(EVMExtraArgsV1 memory extraArgs) internal pure returns (bytes memory bts) {\\n    return abi.encodeWithSelector(EVM_EXTRA_ARGS_V1_TAG, extraArgs);\\n  }\\n}\\n\",\"keccak256\":\"0x2fb8e11d517fa5ee213aaab3f4d416155cd2b72d61ba443dbeff6b41d29e9523\",\"license\":\"MIT\"},\"@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/utils/introspection/IERC165.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (utils/introspection/IERC165.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC165 standard, as defined in the\\n * https://eips.ethereum.org/EIPS/eip-165[EIP].\\n *\\n * Implementers can declare support of contract interfaces, which can then be\\n * queried by others ({ERC165Checker}).\\n *\\n * For an implementation, see {ERC165}.\\n */\\ninterface IERC165 {\\n  /**\\n    * @dev Returns true if this contract implements the interface defined by\\n    * `interfaceId`. See the corresponding\\n    * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[EIP section]\\n    * to learn more about how these ids are created.\\n    *\\n    * This function call must use less than 30 000 gas.\\n    */\\n  function supportsInterface(bytes4 interfaceId) external view returns (bool);\\n}\",\"keccak256\":\"0xac7a4bfe791ee9fe125cac5cd25795b326433e5cf2bdd6b02ad6ad42c2d126a5\",\"license\":\"MIT\"},\"contracts/adapters/Token6022BridgeAdapterCCIP.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport { CCIPReceiver } from \\\"@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol\\\";\\nimport { IRouterClient } from \\\"@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol\\\";\\nimport { Client } from \\\"@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol\\\";\\n\\nimport { IToken6022BridgeCore } from \\\"../interfaces/IToken6022BridgeCore/IToken6022BridgeCore.sol\\\";\\nimport { IToken6022BridgeCoreOwnable } from \\\"../interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol\\\";\\nimport { IToken6022BridgeAdapterCCIP } from \\\"../interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIP.sol\\\";\\n\\ncontract Token6022BridgeAdapterCCIP is CCIPReceiver, IToken6022BridgeAdapterCCIP {\\n    IToken6022BridgeCore public immutable core;\\n\\n    mapping(uint64 chainSelector => bytes peer) public ccipPeers;\\n    mapping(uint64 chainSelector => bytes extraArgs) public ccipExtraArgs;\\n\\n    modifier onlyCoreOwner() {\\n        address coreOwner = IToken6022BridgeCoreOwnable(address(core)).owner();\\n        if (msg.sender != coreOwner) {\\n            revert OnlyCoreOwner(msg.sender, coreOwner);\\n        }\\n        _;\\n    }\\n\\n    /// @notice Initializes a CCIP bridge adapter.\\n    /// @param _core Bridge core contract.\\n    /// @param _ccipRouter Chainlink CCIP router address.\\n    constructor(address _core, address _ccipRouter) CCIPReceiver(_ccipRouter) {\\n        if (_core == address(0)) {\\n            revert InvalidCore(_core);\\n        }\\n\\n        core = IToken6022BridgeCore(_core);\\n    }\\n\\n    /// @notice Sets the trusted remote CCIP adapter for a chain selector.\\n    /// @param _chainSelector CCIP chain selector.\\n    /// @param _peer Trusted remote adapter.\\n    function setCcipPeer(uint64 _chainSelector, bytes calldata _peer) external onlyCoreOwner {\\n        ccipPeers[_chainSelector] = _peer;\\n        emit CcipPeerSet(_chainSelector, _peer);\\n    }\\n\\n    /// @notice Sets CCIP extra arguments for a destination chain selector.\\n    /// @param _chainSelector CCIP destination chain selector.\\n    /// @param _extraArgs Encoded CCIP execution options.\\n    function setCcipExtraArgs(uint64 _chainSelector, bytes calldata _extraArgs) external onlyCoreOwner {\\n        ccipExtraArgs[_chainSelector] = _extraArgs;\\n        emit CcipExtraArgsSet(_chainSelector, _extraArgs);\\n    }\\n\\n    /// @notice Quotes native fee required to send a bridge message through CCIP.\\n    /// @param _dstChainSelector Destination CCIP chain selector.\\n    /// @param _to Recipient on destination chain.\\n    /// @param _amount Token amount to bridge.\\n    /// @param _userTransferId User-provided transfer identifier entropy.\\n    /// @return fee Required native fee.\\n    function quoteCcipSend(\\n        uint64 _dstChainSelector,\\n        address _to,\\n        uint256 _amount,\\n        bytes32 _userTransferId\\n    ) external view returns (uint256 fee) {\\n        bytes32 transferId = _deriveTransferId(msg.sender, _dstChainSelector, _to, _amount, _userTransferId);\\n\\n        return IRouterClient(getRouter()).getFee(\\n            _dstChainSelector, _buildCcipMessage(_dstChainSelector, _to, _amount, transferId)\\n        );\\n    }\\n\\n    /// @notice Bridges tokens through CCIP to the configured remote peer.\\n    /// @param _dstChainSelector Destination CCIP chain selector.\\n    /// @param _to Recipient on destination chain.\\n    /// @param _amount Token amount to bridge.\\n    /// @param _userTransferId User-provided transfer identifier entropy.\\n    /// @return messageId CCIP message identifier.\\n    function sendWithCcip(\\n        uint64 _dstChainSelector,\\n        address _to,\\n        uint256 _amount,\\n        bytes32 _userTransferId\\n    ) external payable returns (bytes32 messageId) {\\n        if (_to == address(0)) {\\n            revert InvalidRecipient(_to);\\n        }\\n\\n        if (ccipPeers[_dstChainSelector].length == 0) {\\n            revert MissingCcipPeer(_dstChainSelector);\\n        }\\n\\n        bytes32 transferId = _deriveTransferId(msg.sender, _dstChainSelector, _to, _amount, _userTransferId);\\n\\n        core.bridgeOut(msg.sender, _amount, transferId);\\n\\n        Client.EVM2AnyMessage memory message = _buildCcipMessage(_dstChainSelector, _to, _amount, transferId);\\n\\n        uint256 fee = IRouterClient(getRouter()).getFee(_dstChainSelector, message);\\n        if (msg.value < fee) {\\n            revert InvalidNativeFee(msg.value, fee);\\n        }\\n\\n        messageId = IRouterClient(getRouter()).ccipSend{ value: fee }(_dstChainSelector, message);\\n\\n        uint256 refund = msg.value - fee;\\n        if (refund != 0) {\\n            (bool success,) = payable(msg.sender).call{ value: refund }(\\\"\\\");\\n            if (!success) {\\n                revert NativeRefundFailed(msg.sender, refund);\\n            }\\n        }\\n\\n        emit CcipSend(_dstChainSelector, messageId, transferId, msg.sender, _to, _amount);\\n    }\\n\\n    /// @notice Handles inbound CCIP messages and forwards payload to core bridge logic.\\n    /// @param _message Incoming CCIP message.\\n    function _ccipReceive(Client.Any2EVMMessage memory _message) internal override {\\n        // Belongs to native CCIP token transfer payload, which is not supported by this adapter\\n        if (_message.destTokenAmounts.length != 0) {\\n            revert UnsupportedCcipTokenPayload(_message.destTokenAmounts.length);\\n        }\\n\\n        bytes memory sourceSender = _message.sender;\\n        bytes memory expectedPeer = ccipPeers[_message.sourceChainSelector];\\n\\n        if (expectedPeer.length == 0 || keccak256(sourceSender) != keccak256(expectedPeer)) {\\n            revert InvalidCcipPeer(_message.sourceChainSelector, sourceSender);\\n        }\\n\\n        (bytes32 transferId, address to, uint256 amount) = abi.decode(_message.data, (bytes32, address, uint256));\\n\\n        core.bridgeIn(to, amount, transferId, _message.messageId);\\n\\n        emit CcipReceive(_message.sourceChainSelector, _message.messageId, transferId, to, amount);\\n    }\\n\\n    /// @notice Builds a CCIP message for bridge transfer payload.\\n    /// @param _dstChainSelector Destination CCIP chain selector.\\n    /// @param _to Recipient on destination chain.\\n    /// @param _amount Token amount to bridge.\\n    /// @param _transferId Cross-chain transfer identifier.\\n    /// @return message Encoded CCIP message.\\n    function _buildCcipMessage(\\n        uint64 _dstChainSelector,\\n        address _to,\\n        uint256 _amount,\\n        bytes32 _transferId\\n    ) internal view returns (Client.EVM2AnyMessage memory message) {\\n        message = Client.EVM2AnyMessage({\\n            receiver: ccipPeers[_dstChainSelector],\\n            data: abi.encode(_transferId, _to, _amount),\\n            tokenAmounts: new Client.EVMTokenAmount[](0),\\n            feeToken: address(0),\\n            extraArgs: ccipExtraArgs[_dstChainSelector]\\n        });\\n    }\\n\\n    /// @notice Derives a collision-resistant transfer identifier from caller and route metadata.\\n    /// @dev User-provided transfer id is treated as entropy and namespaced by adapter + sender + destination + payload.\\n    function _deriveTransferId(\\n        address _sender,\\n        uint64 _dstChainSelector,\\n        address _to,\\n        uint256 _amount,\\n        bytes32 _userTransferId\\n    ) internal view returns (bytes32 transferId) {\\n        transferId = keccak256(\\n            abi.encode(address(this), _sender, _dstChainSelector, _to, _amount, _userTransferId)\\n        );\\n    }\\n}\\n\",\"keccak256\":\"0x8d9dd495e3b8353de3c3e5d4a8942c0f57e69a676f4e7bc0aa8ff6b189beec2d\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCore.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport {IToken6022BridgeCoreErrors} from \\\"./IToken6022BridgeCoreErrors.sol\\\";\\nimport {IToken6022BridgeCoreEvents} from \\\"./IToken6022BridgeCoreEvents.sol\\\";\\nimport {IToken6022BridgeCoreStates} from \\\"./IToken6022BridgeCoreStates.sol\\\";\\nimport {IToken6022BridgeCoreActions} from \\\"./IToken6022BridgeCoreActions.sol\\\";\\nimport {IToken6022BridgeCoreOwnable} from \\\"./IToken6022BridgeCoreOwnable.sol\\\";\\n\\ninterface IToken6022BridgeCore is\\n    IToken6022BridgeCoreErrors,\\n    IToken6022BridgeCoreEvents,\\n    IToken6022BridgeCoreStates,\\n    IToken6022BridgeCoreActions,\\n    IToken6022BridgeCoreOwnable\\n{\\n}\\n\",\"keccak256\":\"0x32974e66dda5385c86947c1ee8d77203f406f479977f8399657ab4d02b9dcd79\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreActions.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreActions {\\n    /// @notice Enables or disables a bridge adapter.\\n    /// @param adapter Adapter address to update.\\n    /// @param enabled Whether the adapter should be authorized.\\n    function setAdapter(address adapter, bool enabled) external;\\n\\n    /// @notice Processes an outbound bridge operation on the current chain.\\n    /// @param from Address providing tokens on outbound bridge.\\n    /// @param amount Token amount bridged out.\\n    /// @param transferId Cross-chain transfer identifier.\\n    function bridgeOut(address from, uint256 amount, bytes32 transferId) external;\\n\\n    /// @notice Processes an inbound bridge operation on the current chain.\\n    /// @param to Recipient of bridged tokens.\\n    /// @param amount Token amount bridged in.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param transportId Transport-level message identifier.\\n    function bridgeIn(address to, uint256 amount, bytes32 transferId, bytes32 transportId) external;\\n}\\n\",\"keccak256\":\"0x82531af50677f200a05199a18df353ca7f97ea460dbcff5a10d53f69b0ecb1b5\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreErrors.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreErrors {\\n    /// @notice Thrown when a caller is not an authorized bridge adapter.\\n    /// @param caller Unauthorized caller address.\\n    error OnlyAdapter(address caller);\\n\\n    /// @notice Thrown when attempting to configure a zero adapter address.\\n    /// @param adapter Invalid adapter address.\\n    error InvalidAdapter(address adapter);\\n\\n    /// @notice Thrown when the bridged amount is zero.\\n    error InvalidAmount();\\n\\n    /// @notice Thrown when a transfer identifier has already been consumed.\\n    /// @param transferId Replayed transfer identifier.\\n    error TransferReplay(bytes32 transferId);\\n\\n    /// @notice Thrown when a transport identifier has already been consumed.\\n    /// @param transportId Replayed transport identifier.\\n    error TransportReplay(bytes32 transportId);\\n}\\n\",\"keccak256\":\"0xbcf2e82030fe54cb26a04e3746d749bd0e5bdb0caca868280ec7277d20350c7e\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreEvents.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreEvents {\\n    /// @notice Emitted when an adapter authorization is updated.\\n    /// @param adapter Adapter address.\\n    /// @param enabled Whether the adapter is enabled.\\n    event AdapterSet(address indexed adapter, bool enabled);\\n\\n    /// @notice Emitted when an outbound bridge operation is processed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param from Source address on this chain.\\n    /// @param amount Bridged token amount.\\n    event BridgeOut(bytes32 indexed transferId, address indexed from, uint256 amount);\\n\\n    /// @notice Emitted when an inbound bridge operation is processed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param transportId Transport-level message identifier.\\n    /// @param to Recipient address on this chain.\\n    /// @param amount Bridged token amount.\\n    event BridgeIn(bytes32 indexed transferId, bytes32 indexed transportId, address indexed to, uint256 amount);\\n}\\n\",\"keccak256\":\"0xbf17cc108014789f70eeaee9b01890c02bde522ae4e15498a7b51cbb76ab054a\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreOwnable.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreOwnable {\\n    function owner() external view returns (address);\\n}\\n\",\"keccak256\":\"0x6d5c687e275f0b8ecafe7dfbf52e4903abc6266724543162cb8f17f690ed926d\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/IToken6022BridgeCore/IToken6022BridgeCoreStates.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeCoreStates {\\n    /// @notice Returns whether an adapter is authorized to call bridge methods.\\n    /// @param adapter Adapter address to query.\\n    /// @return enabled True when adapter is authorized.\\n    function adapters(address adapter) external view returns (bool enabled);\\n\\n    /// @notice Returns whether an outbound transfer identifier has been consumed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @return consumed True when the transfer has already been used.\\n    function outboundTransfers(bytes32 transferId) external view returns (bool consumed);\\n\\n    /// @notice Returns whether an inbound transfer identifier has been consumed.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @return consumed True when the transfer has already been used.\\n    function inboundTransfers(bytes32 transferId) external view returns (bool consumed);\\n\\n    /// @notice Returns whether an inbound transport identifier has been consumed.\\n    /// @param transportId Transport-level message identifier.\\n    /// @return consumed True when the transport identifier has already been used.\\n    function inboundTransportIds(bytes32 transportId) external view returns (bool consumed);\\n}\\n\",\"keccak256\":\"0xb089bd4901021710bd256c3e13c5b1e4c3d7616b007252babc34bbce6c75aa13\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIP.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport { IToken6022BridgeAdapterCCIPErrors } from \\\"./IToken6022BridgeAdapterCCIPErrors.sol\\\";\\nimport { IToken6022BridgeAdapterCCIPEvents } from \\\"./IToken6022BridgeAdapterCCIPEvents.sol\\\";\\nimport { IToken6022BridgeAdapterCCIPStates } from \\\"./IToken6022BridgeAdapterCCIPStates.sol\\\";\\nimport { IToken6022BridgeAdapterCCIPOwnerActions } from \\\"./IToken6022BridgeAdapterCCIPOwnerActions.sol\\\";\\nimport { IToken6022BridgeAdapterCCIPActions } from \\\"./IToken6022BridgeAdapterCCIPActions.sol\\\";\\n\\ninterface IToken6022BridgeAdapterCCIP is\\n    IToken6022BridgeAdapterCCIPErrors,\\n    IToken6022BridgeAdapterCCIPEvents,\\n    IToken6022BridgeAdapterCCIPStates,\\n    IToken6022BridgeAdapterCCIPOwnerActions,\\n    IToken6022BridgeAdapterCCIPActions\\n{\\n}\\n\",\"keccak256\":\"0x4bdb6614bffdd06ae9a48d8b885ce32c6229dcfd5730dad8f117d38157bb0c79\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIPActions.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeAdapterCCIPActions {\\n    /// @notice Quotes native fee to send a bridge message through CCIP.\\n    /// @param dstChainSelector Destination CCIP chain selector.\\n    /// @param to Recipient on destination chain.\\n    /// @param amount Token amount to bridge.\\n    /// @param userTransferId User-provided transfer identifier entropy.\\n    /// @return fee Required native fee.\\n    function quoteCcipSend(\\n        uint64 dstChainSelector,\\n        address to,\\n        uint256 amount,\\n        bytes32 userTransferId\\n    ) external view returns (uint256 fee);\\n\\n    /// @notice Bridges tokens through CCIP to the configured remote peer.\\n    /// @param dstChainSelector Destination CCIP chain selector.\\n    /// @param to Recipient on destination chain.\\n    /// @param amount Token amount to bridge.\\n    /// @param userTransferId User-provided transfer identifier entropy.\\n    /// @return messageId CCIP message identifier.\\n    function sendWithCcip(\\n        uint64 dstChainSelector,\\n        address to,\\n        uint256 amount,\\n        bytes32 userTransferId\\n    ) external payable returns (bytes32 messageId);\\n}\\n\",\"keccak256\":\"0x620e66ed8e7fbf8ed1f9404fcba0ed0d7dd83741c313f396485c1672ccd7ac33\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIPErrors.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeAdapterCCIPErrors {\\n    /// @notice Thrown when caller is not the current core owner.\\n    /// @param caller Unauthorized caller.\\n    /// @param expectedOwner Current bridge core owner.\\n    error OnlyCoreOwner(address caller, address expectedOwner);\\n\\n    /// @notice Thrown when no trusted remote CCIP peer is configured for destination chain.\\n    /// @param chainSelector Destination CCIP chain selector.\\n    error MissingCcipPeer(uint64 chainSelector);\\n\\n    /// @notice Thrown when an inbound message sender does not match configured peer.\\n    /// @param chainSelector Source CCIP chain selector.\\n    /// @param sender Raw CCIP sender bytes from the message.\\n    error InvalidCcipPeer(uint64 chainSelector, bytes sender);\\n\\n    /// @notice Thrown when deploying with a zero core address.\\n    /// @param core Invalid core address.\\n    error InvalidCore(address core);\\n\\n    /// @notice Thrown when destination recipient is invalid.\\n    /// @param recipient Invalid recipient address.\\n    error InvalidRecipient(address recipient);\\n\\n    /// @notice Thrown when supplied native fee is below required fee.\\n    /// @param supplied Native value provided by caller.\\n    /// @param required Required native fee.\\n    error InvalidNativeFee(uint256 supplied, uint256 required);\\n\\n    /// @notice Thrown when refunding excess native fee to caller fails.\\n    /// @param recipient Refund recipient.\\n    /// @param amount Refund amount.\\n    error NativeRefundFailed(address recipient, uint256 amount);\\n\\n    /// @notice Thrown when inbound CCIP message unexpectedly carries token amounts.\\n    /// @param tokenCount Number of token entries in the payload.\\n    error UnsupportedCcipTokenPayload(uint256 tokenCount);\\n}\\n\",\"keccak256\":\"0x99c0c687ac7fa33bdbe02dd78e6f081bfa1c6a9832aba2da617762cc64c083b3\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIPEvents.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeAdapterCCIPEvents {\\n    /// @notice Emitted when trusted CCIP peer is configured for a chain selector.\\n    /// @param chainSelector CCIP chain selector.\\n    /// @param peer Trusted remote adapter identifier bytes.\\n    event CcipPeerSet(uint64 indexed chainSelector, bytes peer);\\n\\n    /// @notice Emitted when CCIP extra arguments are configured for a chain selector.\\n    /// @param chainSelector CCIP chain selector.\\n    /// @param extraArgs Encoded CCIP execution options.\\n    event CcipExtraArgsSet(uint64 indexed chainSelector, bytes extraArgs);\\n\\n    /// @notice Emitted when an outbound CCIP bridge message is sent.\\n    /// @param dstChainSelector Destination CCIP chain selector.\\n    /// @param messageId CCIP message identifier.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param from Source address on this chain.\\n    /// @param to Destination recipient address.\\n    /// @param amount Bridged token amount.\\n    event CcipSend(\\n        uint64 indexed dstChainSelector,\\n        bytes32 indexed messageId,\\n        bytes32 indexed transferId,\\n        address from,\\n        address to,\\n        uint256 amount\\n    );\\n\\n    /// @notice Emitted when an inbound CCIP message is accepted and bridged in.\\n    /// @param srcChainSelector Source CCIP chain selector.\\n    /// @param messageId CCIP message identifier.\\n    /// @param transferId Cross-chain transfer identifier.\\n    /// @param to Destination recipient address on this chain.\\n    /// @param amount Bridged token amount.\\n    event CcipReceive(\\n        uint64 indexed srcChainSelector,\\n        bytes32 indexed messageId,\\n        bytes32 indexed transferId,\\n        address to,\\n        uint256 amount\\n    );\\n}\\n\",\"keccak256\":\"0xb517e32078f26022b03d626213515195a12ef6dac8e97f39db4e068c2ab69a49\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIPOwnerActions.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\ninterface IToken6022BridgeAdapterCCIPOwnerActions {\\n    /// @notice Sets the trusted CCIP peer for a source or destination chain.\\n    /// @param chainSelector CCIP chain selector.\\n    /// @param peer Trusted remote adapter identifier bytes.\\n    function setCcipPeer(uint64 chainSelector, bytes calldata peer) external;\\n\\n    /// @notice Sets CCIP extra arguments used when sending to a destination chain.\\n    /// @param chainSelector CCIP destination chain selector.\\n    /// @param extraArgs Encoded CCIP execution options.\\n    function setCcipExtraArgs(uint64 chainSelector, bytes calldata extraArgs) external;\\n}\\n\",\"keccak256\":\"0xf636c4c0c992edeba1ed3625dd43bb5598ebc661e9a890c36492f539921512cc\",\"license\":\"UNLICENSED\"},\"contracts/interfaces/adapters/IToken6022BridgeAdapterCCIP/IToken6022BridgeAdapterCCIPStates.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.22;\\n\\nimport { IToken6022BridgeCore } from \\\"../../IToken6022BridgeCore/IToken6022BridgeCore.sol\\\";\\n\\ninterface IToken6022BridgeAdapterCCIPStates {\\n    /// @notice Returns the bridge core managed by this adapter.\\n    /// @return Bridge core contract.\\n    function core() external view returns (IToken6022BridgeCore);\\n\\n    /// @notice Returns the trusted remote adapter for a CCIP chain selector.\\n    /// @param chainSelector CCIP chain selector.\\n    /// @return peer Trusted remote adapter identifier bytes.\\n    function ccipPeers(uint64 chainSelector) external view returns (bytes memory peer);\\n\\n    /// @notice Returns CCIP extra arguments configured for destination chain selector.\\n    /// @param chainSelector CCIP chain selector.\\n    /// @return extraArgs Encoded CCIP execution options.\\n    function ccipExtraArgs(uint64 chainSelector) external view returns (bytes memory extraArgs);\\n}\\n\",\"keccak256\":\"0x01ca2f2c429419ebf696d28718c084e1a982ca06265d73f626bc232052adc215\",\"license\":\"UNLICENSED\"}},\"version\":1}",
+  "bytecode": "0x60c06040523480156200001157600080fd5b50604051620017ba380380620017ba8339810160408190526200003491620000cf565b806001600160a01b03811662000065576040516335fdcccd60e21b8152600060048201526024015b60405180910390fd5b6001600160a01b0390811660805282166200009f576040516332799b9d60e11b81526001600160a01b03831660048201526024016200005c565b506001600160a01b031660a05262000107565b80516001600160a01b0381168114620000ca57600080fd5b919050565b60008060408385031215620000e357600080fd5b620000ee83620000b2565b9150620000fe60208401620000b2565b90509250929050565b60805160a0516116556200016560003960008181610218015281816103c90152818161067f015281816108da0152610e2701526000818161018e0152818161044101528181610511015281816107cc015261083401526116556000f3fe6080604052600436106100915760003560e01c806385572ffb1161005957806385572ffb1461015f578063b0f479a11461017f578063d1a18894146101c6578063d3d2de6a146101e6578063f2f4eb261461020657600080fd5b8063016e2d2e1461009657806301ffc9a7146100cc5780632508af4a146100fc578063369356a51461011d57806382132d9b1461013f575b600080fd5b3480156100a257600080fd5b506100b66100b1366004610efe565b61023a565b6040516100c39190610f66565b60405180910390f35b3480156100d857600080fd5b506100ec6100e7366004610f79565b6102d4565b60405190151581526020016100c3565b61010f61010a366004610fb8565b61030b565b6040519081526020016100c3565b34801561012957600080fd5b5061013d610138366004610ffc565b61067b565b005b34801561014b57600080fd5b506100b661015a366004610efe565b6107a8565b34801561016b57600080fd5b5061013d61017a36600461107e565b6107c1565b34801561018b57600080fd5b507f00000000000000000000000000000000000000000000000000000000000000005b6040516001600160a01b0390911681526020016100c3565b3480156101d257600080fd5b5061010f6101e1366004610fb8565b610820565b3480156101f257600080fd5b5061013d610201366004610ffc565b6108d6565b34801561021257600080fd5b506101ae7f000000000000000000000000000000000000000000000000000000000000000081565b60016020526000908152604090208054610253906110b8565b80601f016020809104026020016040519081016040528092919081815260200182805461027f906110b8565b80156102cc5780601f106102a1576101008083540402835291602001916102cc565b820191906000526020600020905b8154815290600101906020018083116102af57829003601f168201915b505050505081565b60006001600160e01b031982166385572ffb60e01b148061030557506001600160e01b031982166301ffc9a760e01b145b92915050565b60006001600160a01b03841661034457604051630bc2c5df60e11b81526001600160a01b03851660048201526024015b60405180910390fd5b6001600160401b03851660009081526020819052604090208054610367906110b8565b905060000361039457604051631acbcb3f60e21b81526001600160401b038616600482015260240161033b565b60006103a333878787876109f5565b604051639d10f39d60e01b815233600482015260248101869052604481018290529091507f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031690639d10f39d90606401600060405180830381600087803b15801561041557600080fd5b505af1158015610429573d6000803e3d6000fd5b50505050600061043b87878785610a57565b905060007f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03166320487ded89846040518363ffffffff1660e01b815260040161048d9291906110f2565b602060405180830381865afa1580156104aa573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104ce91906111ce565b9050803410156104fa57604051630a73cae960e21b81523460048201526024810182905260440161033b565b6040516396f4e9f960e01b81526001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016906396f4e9f990839061054a908c9087906004016110f2565b60206040518083038185885af1158015610568573d6000803e3d6000fd5b50505050506040513d601f19601f8201168201806040525081019061058d91906111ce565b9350600061059b82346111e7565b9050801561061757604051600090339083908381818185875af1925050503d80600081146105e5576040519150601f19603f3d011682016040523d82523d6000602084013e6105ea565b606091505b505090508061061557604051631312898b60e01b81523360048201526024810183905260440161033b565b505b604080513381526001600160a01b038a166020820152908101889052849086906001600160401b038c16907ff73a1686bed127f4c01f791c13bfec972a5a967c871dba7664376bfcb697cf689060600160405180910390a450505050949350505050565b60007f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316638da5cb5b6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156106db573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906106ff9190611208565b9050336001600160a01b0382161461073b5760405163325fa6a760e11b81523360048201526001600160a01b038216602482015260440161033b565b6001600160401b038416600090815260208190526040902061075e83858361128c565b50836001600160401b03167f16e8cd03e48eb7ab15bdf2a1f6bc1d5f0e35f93596f9b1c4dcd8cb4c9ab88bcd848460405161079a92919061134c565b60405180910390a250505050565b60006020819052908152604090208054610253906110b8565b336001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000161461080c576040516335fdcccd60e21b815233600482015260240161033b565b61081d61081882611510565b610cab565b50565b60008061083033878787876109f5565b90507f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03166320487ded8761086e89898987610a57565b6040518363ffffffff1660e01b815260040161088b9291906110f2565b602060405180830381865afa1580156108a8573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108cc91906111ce565b9695505050505050565b60007f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316638da5cb5b6040518163ffffffff1660e01b8152600401602060405180830381865afa158015610936573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061095a9190611208565b9050336001600160a01b038216146109965760405163325fa6a760e11b81523360048201526001600160a01b038216602482015260440161033b565b6001600160401b03841660009081526001602052604090206109b983858361128c565b50836001600160401b03167f4b003bea3bfeac705980a447225d19fbd104a0ad280b37c3f5c0c27c982bfa6c848460405161079a92919061134c565b60408051306020808301919091526001600160a01b03978816828401526001600160401b0396909616606082015293909516608084015260a083019190915260c0808301919091528351808303909101815260e0909101909252815191012090565b610a926040518060a0016040528060608152602001606081526020016060815260200160006001600160a01b03168152602001606081525090565b6040518060a00160405280600080886001600160401b03166001600160401b031681526020019081526020016000208054610acc906110b8565b80601f0160208091040260200160405190810160405280929190818152602001828054610af8906110b8565b8015610b455780601f10610b1a57610100808354040283529160200191610b45565b820191906000526020600020905b815481529060010190602001808311610b2857829003601f168201915b50505050508152602001838686604051602001610b7e939291909283526001600160a01b03919091166020830152604082015260600190565b60408051601f1981840301815291905281526020016000604051908082528060200260200182016040528015610bda57816020015b6040805180820190915260008082526020820152815260200190600190039081610bb35790505b50815260200160006001600160a01b0316815260200160016000886001600160401b03166001600160401b031681526020019081526020016000208054610c20906110b8565b80601f0160208091040260200160405190810160405280929190818152602001828054610c4c906110b8565b8015610c995780601f10610c6e57610100808354040283529160200191610c99565b820191906000526020600020905b815481529060010190602001808311610c7c57829003601f168201915b50505050508152509050949350505050565b60808101515115610cd857806080015151604051630512e0f760e51b815260040161033b91815260200190565b6040808201516020808401516001600160401b03166000908152908190529182208054919291610d07906110b8565b80601f0160208091040260200160405190810160405280929190818152602001828054610d33906110b8565b8015610d805780601f10610d5557610100808354040283529160200191610d80565b820191906000526020600020905b815481529060010190602001808311610d6357829003601f168201915b50505050509050805160001480610da557508080519060200120828051906020012014155b15610dcb5782602001518260405163cd56e3f360e01b815260040161033b9291906115bc565b60008060008560600151806020019051810190610de891906115e6565b88516040516310b7639160e11b81526001600160a01b0380851660048301526024820184905260448201869052606482019290925293965091945092507f0000000000000000000000000000000000000000000000000000000000000000169063216ec72290608401600060405180830381600087803b158015610e6b57600080fd5b505af1158015610e7f573d6000803e3d6000fd5b505087516020808a0151604080516001600160a01b03891681529283018790528895509293506001600160401b0316917f1facce7259bbbf7b8d470f6cd3fe74ea03fd926d4f4d203f7bc33c4f93b94774910160405180910390a4505050505050565b80356001600160401b0381168114610ef957600080fd5b919050565b600060208284031215610f1057600080fd5b610f1982610ee2565b9392505050565b6000815180845260005b81811015610f4657602081850181015186830182015201610f2a565b506000602082860101526020601f19601f83011685010191505092915050565b602081526000610f196020830184610f20565b600060208284031215610f8b57600080fd5b81356001600160e01b031981168114610f1957600080fd5b6001600160a01b038116811461081d57600080fd5b60008060008060808587031215610fce57600080fd5b610fd785610ee2565b93506020850135610fe781610fa3565b93969395505050506040820135916060013590565b60008060006040848603121561101157600080fd5b61101a84610ee2565b925060208401356001600160401b038082111561103657600080fd5b818601915086601f83011261104a57600080fd5b81358181111561105957600080fd5b87602082850101111561106b57600080fd5b6020830194508093505050509250925092565b60006020828403121561109057600080fd5b81356001600160401b038111156110a657600080fd5b820160a08185031215610f1957600080fd5b600181811c908216806110cc57607f821691505b6020821081036110ec57634e487b7160e01b600052602260045260246000fd5b50919050565b600060406001600160401b03851683526020604081850152845160a0604086015261112060e0860182610f20565b905081860151603f198087840301606088015261113d8383610f20565b6040890151888203830160808a01528051808352908601945060009350908501905b8084101561119157845180516001600160a01b031683528601518683015293850193600193909301929086019061115f565b5060608901516001600160a01b031660a08901526080890151888203830160c08a015295506111c08187610f20565b9a9950505050505050505050565b6000602082840312156111e057600080fd5b5051919050565b8181038181111561030557634e487b7160e01b600052601160045260246000fd5b60006020828403121561121a57600080fd5b8151610f1981610fa3565b634e487b7160e01b600052604160045260246000fd5b601f821115611287576000816000526020600020601f850160051c810160208610156112645750805b601f850160051c820191505b8181101561128357828155600101611270565b5050505b505050565b6001600160401b038311156112a3576112a3611225565b6112b7836112b183546110b8565b8361123b565b6000601f8411600181146112eb57600085156112d35750838201355b600019600387901b1c1916600186901b178355611345565b600083815260209020601f19861690835b8281101561131c57868501358255602094850194600190920191016112fc565b50868210156113395760001960f88860031b161c19848701351681555b505060018560011b0183555b5050505050565b60208152816020820152818360408301376000818301604090810191909152601f909201601f19160101919050565b604080519081016001600160401b038111828210171561139d5761139d611225565b60405290565b60405160a081016001600160401b038111828210171561139d5761139d611225565b604051601f8201601f191681016001600160401b03811182821017156113ed576113ed611225565b604052919050565b600082601f83011261140657600080fd5b81356001600160401b0381111561141f5761141f611225565b611432601f8201601f19166020016113c5565b81815284602083860101111561144757600080fd5b816020850160208301376000918101602001919091529392505050565b600082601f83011261147557600080fd5b813560206001600160401b0382111561149057611490611225565b61149e818360051b016113c5565b82815260069290921b840181019181810190868411156114bd57600080fd5b8286015b8481101561150557604081890312156114da5760008081fd5b6114e261137b565b81356114ed81610fa3565b815281850135858201528352918301916040016114c1565b509695505050505050565b600060a0823603121561152257600080fd5b61152a6113a3565b8235815261153a60208401610ee2565b602082015260408301356001600160401b038082111561155957600080fd5b611565368387016113f5565b6040840152606085013591508082111561157e57600080fd5b61158a368387016113f5565b606084015260808501359150808211156115a357600080fd5b506115b036828601611464565b60808301525092915050565b6001600160401b03831681526040602082015260006115de6040830184610f20565b949350505050565b6000806000606084860312156115fb57600080fd5b83519250602084015161160d81610fa3565b8092505060408401519050925092509256fea2646970667358221220225373799b13cb19cc78beb2990738eff72f49157b110d2f169a3d2286c3b38f64736f6c63430008160033",
+  "deployedBytecode": "0x6080604052600436106100915760003560e01c806385572ffb1161005957806385572ffb1461015f578063b0f479a11461017f578063d1a18894146101c6578063d3d2de6a146101e6578063f2f4eb261461020657600080fd5b8063016e2d2e1461009657806301ffc9a7146100cc5780632508af4a146100fc578063369356a51461011d57806382132d9b1461013f575b600080fd5b3480156100a257600080fd5b506100b66100b1366004610efe565b61023a565b6040516100c39190610f66565b60405180910390f35b3480156100d857600080fd5b506100ec6100e7366004610f79565b6102d4565b60405190151581526020016100c3565b61010f61010a366004610fb8565b61030b565b6040519081526020016100c3565b34801561012957600080fd5b5061013d610138366004610ffc565b61067b565b005b34801561014b57600080fd5b506100b661015a366004610efe565b6107a8565b34801561016b57600080fd5b5061013d61017a36600461107e565b6107c1565b34801561018b57600080fd5b507f00000000000000000000000000000000000000000000000000000000000000005b6040516001600160a01b0390911681526020016100c3565b3480156101d257600080fd5b5061010f6101e1366004610fb8565b610820565b3480156101f257600080fd5b5061013d610201366004610ffc565b6108d6565b34801561021257600080fd5b506101ae7f000000000000000000000000000000000000000000000000000000000000000081565b60016020526000908152604090208054610253906110b8565b80601f016020809104026020016040519081016040528092919081815260200182805461027f906110b8565b80156102cc5780601f106102a1576101008083540402835291602001916102cc565b820191906000526020600020905b8154815290600101906020018083116102af57829003601f168201915b505050505081565b60006001600160e01b031982166385572ffb60e01b148061030557506001600160e01b031982166301ffc9a760e01b145b92915050565b60006001600160a01b03841661034457604051630bc2c5df60e11b81526001600160a01b03851660048201526024015b60405180910390fd5b6001600160401b03851660009081526020819052604090208054610367906110b8565b905060000361039457604051631acbcb3f60e21b81526001600160401b038616600482015260240161033b565b60006103a333878787876109f5565b604051639d10f39d60e01b815233600482015260248101869052604481018290529091507f00000000000000000000000000000000000000000000000000000000000000006001600160a01b031690639d10f39d90606401600060405180830381600087803b15801561041557600080fd5b505af1158015610429573d6000803e3d6000fd5b50505050600061043b87878785610a57565b905060007f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03166320487ded89846040518363ffffffff1660e01b815260040161048d9291906110f2565b602060405180830381865afa1580156104aa573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104ce91906111ce565b9050803410156104fa57604051630a73cae960e21b81523460048201526024810182905260440161033b565b6040516396f4e9f960e01b81526001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016906396f4e9f990839061054a908c9087906004016110f2565b60206040518083038185885af1158015610568573d6000803e3d6000fd5b50505050506040513d601f19601f8201168201806040525081019061058d91906111ce565b9350600061059b82346111e7565b9050801561061757604051600090339083908381818185875af1925050503d80600081146105e5576040519150601f19603f3d011682016040523d82523d6000602084013e6105ea565b606091505b505090508061061557604051631312898b60e01b81523360048201526024810183905260440161033b565b505b604080513381526001600160a01b038a166020820152908101889052849086906001600160401b038c16907ff73a1686bed127f4c01f791c13bfec972a5a967c871dba7664376bfcb697cf689060600160405180910390a450505050949350505050565b60007f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316638da5cb5b6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156106db573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906106ff9190611208565b9050336001600160a01b0382161461073b5760405163325fa6a760e11b81523360048201526001600160a01b038216602482015260440161033b565b6001600160401b038416600090815260208190526040902061075e83858361128c565b50836001600160401b03167f16e8cd03e48eb7ab15bdf2a1f6bc1d5f0e35f93596f9b1c4dcd8cb4c9ab88bcd848460405161079a92919061134c565b60405180910390a250505050565b60006020819052908152604090208054610253906110b8565b336001600160a01b037f0000000000000000000000000000000000000000000000000000000000000000161461080c576040516335fdcccd60e21b815233600482015260240161033b565b61081d61081882611510565b610cab565b50565b60008061083033878787876109f5565b90507f00000000000000000000000000000000000000000000000000000000000000006001600160a01b03166320487ded8761086e89898987610a57565b6040518363ffffffff1660e01b815260040161088b9291906110f2565b602060405180830381865afa1580156108a8573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108cc91906111ce565b9695505050505050565b60007f00000000000000000000000000000000000000000000000000000000000000006001600160a01b0316638da5cb5b6040518163ffffffff1660e01b8152600401602060405180830381865afa158015610936573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061095a9190611208565b9050336001600160a01b038216146109965760405163325fa6a760e11b81523360048201526001600160a01b038216602482015260440161033b565b6001600160401b03841660009081526001602052604090206109b983858361128c565b50836001600160401b03167f4b003bea3bfeac705980a447225d19fbd104a0ad280b37c3f5c0c27c982bfa6c848460405161079a92919061134c565b60408051306020808301919091526001600160a01b03978816828401526001600160401b0396909616606082015293909516608084015260a083019190915260c0808301919091528351808303909101815260e0909101909252815191012090565b610a926040518060a0016040528060608152602001606081526020016060815260200160006001600160a01b03168152602001606081525090565b6040518060a00160405280600080886001600160401b03166001600160401b031681526020019081526020016000208054610acc906110b8565b80601f0160208091040260200160405190810160405280929190818152602001828054610af8906110b8565b8015610b455780601f10610b1a57610100808354040283529160200191610b45565b820191906000526020600020905b815481529060010190602001808311610b2857829003601f168201915b50505050508152602001838686604051602001610b7e939291909283526001600160a01b03919091166020830152604082015260600190565b60408051601f1981840301815291905281526020016000604051908082528060200260200182016040528015610bda57816020015b6040805180820190915260008082526020820152815260200190600190039081610bb35790505b50815260200160006001600160a01b0316815260200160016000886001600160401b03166001600160401b031681526020019081526020016000208054610c20906110b8565b80601f0160208091040260200160405190810160405280929190818152602001828054610c4c906110b8565b8015610c995780601f10610c6e57610100808354040283529160200191610c99565b820191906000526020600020905b815481529060010190602001808311610c7c57829003601f168201915b50505050508152509050949350505050565b60808101515115610cd857806080015151604051630512e0f760e51b815260040161033b91815260200190565b6040808201516020808401516001600160401b03166000908152908190529182208054919291610d07906110b8565b80601f0160208091040260200160405190810160405280929190818152602001828054610d33906110b8565b8015610d805780601f10610d5557610100808354040283529160200191610d80565b820191906000526020600020905b815481529060010190602001808311610d6357829003601f168201915b50505050509050805160001480610da557508080519060200120828051906020012014155b15610dcb5782602001518260405163cd56e3f360e01b815260040161033b9291906115bc565b60008060008560600151806020019051810190610de891906115e6565b88516040516310b7639160e11b81526001600160a01b0380851660048301526024820184905260448201869052606482019290925293965091945092507f0000000000000000000000000000000000000000000000000000000000000000169063216ec72290608401600060405180830381600087803b158015610e6b57600080fd5b505af1158015610e7f573d6000803e3d6000fd5b505087516020808a0151604080516001600160a01b03891681529283018790528895509293506001600160401b0316917f1facce7259bbbf7b8d470f6cd3fe74ea03fd926d4f4d203f7bc33c4f93b94774910160405180910390a4505050505050565b80356001600160401b0381168114610ef957600080fd5b919050565b600060208284031215610f1057600080fd5b610f1982610ee2565b9392505050565b6000815180845260005b81811015610f4657602081850181015186830182015201610f2a565b506000602082860101526020601f19601f83011685010191505092915050565b602081526000610f196020830184610f20565b600060208284031215610f8b57600080fd5b81356001600160e01b031981168114610f1957600080fd5b6001600160a01b038116811461081d57600080fd5b60008060008060808587031215610fce57600080fd5b610fd785610ee2565b93506020850135610fe781610fa3565b93969395505050506040820135916060013590565b60008060006040848603121561101157600080fd5b61101a84610ee2565b925060208401356001600160401b038082111561103657600080fd5b818601915086601f83011261104a57600080fd5b81358181111561105957600080fd5b87602082850101111561106b57600080fd5b6020830194508093505050509250925092565b60006020828403121561109057600080fd5b81356001600160401b038111156110a657600080fd5b820160a08185031215610f1957600080fd5b600181811c908216806110cc57607f821691505b6020821081036110ec57634e487b7160e01b600052602260045260246000fd5b50919050565b600060406001600160401b03851683526020604081850152845160a0604086015261112060e0860182610f20565b905081860151603f198087840301606088015261113d8383610f20565b6040890151888203830160808a01528051808352908601945060009350908501905b8084101561119157845180516001600160a01b031683528601518683015293850193600193909301929086019061115f565b5060608901516001600160a01b031660a08901526080890151888203830160c08a015295506111c08187610f20565b9a9950505050505050505050565b6000602082840312156111e057600080fd5b5051919050565b8181038181111561030557634e487b7160e01b600052601160045260246000fd5b60006020828403121561121a57600080fd5b8151610f1981610fa3565b634e487b7160e01b600052604160045260246000fd5b601f821115611287576000816000526020600020601f850160051c810160208610156112645750805b601f850160051c820191505b8181101561128357828155600101611270565b5050505b505050565b6001600160401b038311156112a3576112a3611225565b6112b7836112b183546110b8565b8361123b565b6000601f8411600181146112eb57600085156112d35750838201355b600019600387901b1c1916600186901b178355611345565b600083815260209020601f19861690835b8281101561131c57868501358255602094850194600190920191016112fc565b50868210156113395760001960f88860031b161c19848701351681555b505060018560011b0183555b5050505050565b60208152816020820152818360408301376000818301604090810191909152601f909201601f19160101919050565b604080519081016001600160401b038111828210171561139d5761139d611225565b60405290565b60405160a081016001600160401b038111828210171561139d5761139d611225565b604051601f8201601f191681016001600160401b03811182821017156113ed576113ed611225565b604052919050565b600082601f83011261140657600080fd5b81356001600160401b0381111561141f5761141f611225565b611432601f8201601f19166020016113c5565b81815284602083860101111561144757600080fd5b816020850160208301376000918101602001919091529392505050565b600082601f83011261147557600080fd5b813560206001600160401b0382111561149057611490611225565b61149e818360051b016113c5565b82815260069290921b840181019181810190868411156114bd57600080fd5b8286015b8481101561150557604081890312156114da5760008081fd5b6114e261137b565b81356114ed81610fa3565b815281850135858201528352918301916040016114c1565b509695505050505050565b600060a0823603121561152257600080fd5b61152a6113a3565b8235815261153a60208401610ee2565b602082015260408301356001600160401b038082111561155957600080fd5b611565368387016113f5565b6040840152606085013591508082111561157e57600080fd5b61158a368387016113f5565b606084015260808501359150808211156115a357600080fd5b506115b036828601611464565b60808301525092915050565b6001600160401b03831681526040602082015260006115de6040830184610f20565b949350505050565b6000806000606084860312156115fb57600080fd5b83519250602084015161160d81610fa3565b8092505060408401519050925092509256fea2646970667358221220225373799b13cb19cc78beb2990738eff72f49157b110d2f169a3d2286c3b38f64736f6c63430008160033",
+  "devdoc": {
+    "errors": {
+      "InvalidCcipPeer(uint64,bytes)": [
+        {
+          "params": {
+            "chainSelector": "Source CCIP chain selector.",
+            "sender": "Raw CCIP sender bytes from the message."
+          }
+        }
+      ],
+      "InvalidCore(address)": [
+        {
+          "params": {
+            "core": "Invalid core address."
+          }
+        }
+      ],
+      "InvalidNativeFee(uint256,uint256)": [
+        {
+          "params": {
+            "required": "Required native fee.",
+            "supplied": "Native value provided by caller."
+          }
+        }
+      ],
+      "InvalidRecipient(address)": [
+        {
+          "params": {
+            "recipient": "Invalid recipient address."
+          }
+        }
+      ],
+      "MissingCcipPeer(uint64)": [
+        {
+          "params": {
+            "chainSelector": "Destination CCIP chain selector."
+          }
+        }
+      ],
+      "NativeRefundFailed(address,uint256)": [
+        {
+          "params": {
+            "amount": "Refund amount.",
+            "recipient": "Refund recipient."
+          }
+        }
+      ],
+      "OnlyCoreOwner(address,address)": [
+        {
+          "params": {
+            "caller": "Unauthorized caller.",
+            "expectedOwner": "Current bridge core owner."
+          }
+        }
+      ],
+      "UnsupportedCcipTokenPayload(uint256)": [
+        {
+          "params": {
+            "tokenCount": "Number of token entries in the payload."
+          }
+        }
+      ]
+    },
+    "events": {
+      "CcipExtraArgsSet(uint64,bytes)": {
+        "params": {
+          "chainSelector": "CCIP chain selector.",
+          "extraArgs": "Encoded CCIP execution options."
+        }
+      },
+      "CcipPeerSet(uint64,bytes)": {
+        "params": {
+          "chainSelector": "CCIP chain selector.",
+          "peer": "Trusted remote adapter identifier bytes."
+        }
+      },
+      "CcipReceive(uint64,bytes32,bytes32,address,uint256)": {
+        "params": {
+          "amount": "Bridged token amount.",
+          "messageId": "CCIP message identifier.",
+          "srcChainSelector": "Source CCIP chain selector.",
+          "to": "Destination recipient address on this chain.",
+          "transferId": "Cross-chain transfer identifier."
+        }
+      },
+      "CcipSend(uint64,bytes32,bytes32,address,address,uint256)": {
+        "params": {
+          "amount": "Bridged token amount.",
+          "dstChainSelector": "Destination CCIP chain selector.",
+          "from": "Source address on this chain.",
+          "messageId": "CCIP message identifier.",
+          "to": "Destination recipient address.",
+          "transferId": "Cross-chain transfer identifier."
+        }
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "ccipReceive((bytes32,uint64,bytes,bytes,(address,uint256)[]))": {
+        "details": "Note ensure you check the msg.sender is the OffRampRouter",
+        "params": {
+          "message": "CCIP Message"
+        }
+      },
+      "constructor": {
+        "params": {
+          "_ccipRouter": "Chainlink CCIP router address.",
+          "_core": "Bridge core contract."
+        }
+      },
+      "getRouter()": {
+        "returns": {
+          "_0": "i_router address"
+        }
+      },
+      "quoteCcipSend(uint64,address,uint256,bytes32)": {
+        "params": {
+          "_amount": "Token amount to bridge.",
+          "_dstChainSelector": "Destination CCIP chain selector.",
+          "_to": "Recipient on destination chain.",
+          "_userTransferId": "User-provided transfer identifier entropy."
+        },
+        "returns": {
+          "fee": "Required native fee."
+        }
+      },
+      "sendWithCcip(uint64,address,uint256,bytes32)": {
+        "params": {
+          "_amount": "Token amount to bridge.",
+          "_dstChainSelector": "Destination CCIP chain selector.",
+          "_to": "Recipient on destination chain.",
+          "_userTransferId": "User-provided transfer identifier entropy."
+        },
+        "returns": {
+          "messageId": "CCIP message identifier."
+        }
+      },
+      "setCcipExtraArgs(uint64,bytes)": {
+        "params": {
+          "_chainSelector": "CCIP destination chain selector.",
+          "_extraArgs": "Encoded CCIP execution options."
+        }
+      },
+      "setCcipPeer(uint64,bytes)": {
+        "params": {
+          "_chainSelector": "CCIP chain selector.",
+          "_peer": "Trusted remote adapter."
+        }
+      },
+      "supportsInterface(bytes4)": {
+        "params": {
+          "interfaceId": "The interfaceId to check"
+        },
+        "returns": {
+          "_0": "true if the interfaceId is supported"
+        }
+      }
+    },
+    "stateVariables": {
+      "ccipExtraArgs": {
+        "params": {
+          "chainSelector": "CCIP chain selector."
+        },
+        "return": "extraArgs Encoded CCIP execution options.",
+        "returns": {
+          "extraArgs": "Encoded CCIP execution options."
+        }
+      },
+      "ccipPeers": {
+        "params": {
+          "chainSelector": "CCIP chain selector."
+        },
+        "return": "peer Trusted remote adapter identifier bytes.",
+        "returns": {
+          "peer": "Trusted remote adapter identifier bytes."
+        }
+      },
+      "core": {
+        "return": "Bridge core contract.",
+        "returns": {
+          "_0": "Bridge core contract."
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "errors": {
+      "InvalidCcipPeer(uint64,bytes)": [
+        {
+          "notice": "Thrown when an inbound message sender does not match configured peer."
+        }
+      ],
+      "InvalidCore(address)": [
+        {
+          "notice": "Thrown when deploying with a zero core address."
+        }
+      ],
+      "InvalidNativeFee(uint256,uint256)": [
+        {
+          "notice": "Thrown when supplied native fee is below required fee."
+        }
+      ],
+      "InvalidRecipient(address)": [
+        {
+          "notice": "Thrown when destination recipient is invalid."
+        }
+      ],
+      "MissingCcipPeer(uint64)": [
+        {
+          "notice": "Thrown when no trusted remote CCIP peer is configured for destination chain."
+        }
+      ],
+      "NativeRefundFailed(address,uint256)": [
+        {
+          "notice": "Thrown when refunding excess native fee to caller fails."
+        }
+      ],
+      "OnlyCoreOwner(address,address)": [
+        {
+          "notice": "Thrown when caller is not the current core owner."
+        }
+      ],
+      "UnsupportedCcipTokenPayload(uint256)": [
+        {
+          "notice": "Thrown when inbound CCIP message unexpectedly carries token amounts."
+        }
+      ]
+    },
+    "events": {
+      "CcipExtraArgsSet(uint64,bytes)": {
+        "notice": "Emitted when CCIP extra arguments are configured for a chain selector."
+      },
+      "CcipPeerSet(uint64,bytes)": {
+        "notice": "Emitted when trusted CCIP peer is configured for a chain selector."
+      },
+      "CcipReceive(uint64,bytes32,bytes32,address,uint256)": {
+        "notice": "Emitted when an inbound CCIP message is accepted and bridged in."
+      },
+      "CcipSend(uint64,bytes32,bytes32,address,address,uint256)": {
+        "notice": "Emitted when an outbound CCIP bridge message is sent."
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "ccipExtraArgs(uint64)": {
+        "notice": "Returns CCIP extra arguments configured for destination chain selector."
+      },
+      "ccipPeers(uint64)": {
+        "notice": "Returns the trusted remote adapter for a CCIP chain selector."
+      },
+      "ccipReceive((bytes32,uint64,bytes,bytes,(address,uint256)[]))": {
+        "notice": "Called by the Router to deliver a message. If this reverts, any token transfers also revert. The message will move to a FAILED state and become available for manual execution."
+      },
+      "constructor": {
+        "notice": "Initializes a CCIP bridge adapter."
+      },
+      "core()": {
+        "notice": "Returns the bridge core managed by this adapter."
+      },
+      "getRouter()": {
+        "notice": "Return the current router"
+      },
+      "quoteCcipSend(uint64,address,uint256,bytes32)": {
+        "notice": "Quotes native fee required to send a bridge message through CCIP."
+      },
+      "sendWithCcip(uint64,address,uint256,bytes32)": {
+        "notice": "Bridges tokens through CCIP to the configured remote peer."
+      },
+      "setCcipExtraArgs(uint64,bytes)": {
+        "notice": "Sets CCIP extra arguments for a destination chain selector."
+      },
+      "setCcipPeer(uint64,bytes)": {
+        "notice": "Sets the trusted remote CCIP adapter for a chain selector."
+      },
+      "supportsInterface(bytes4)": {
+        "notice": "IERC165 supports an interfaceId"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 278,
+        "contract": "contracts/adapters/Token6022BridgeAdapterCCIP.sol:Token6022BridgeAdapterCCIP",
+        "label": "ccipPeers",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_uint64,t_bytes_storage)"
+      },
+      {
+        "astId": 282,
+        "contract": "contracts/adapters/Token6022BridgeAdapterCCIP.sol:Token6022BridgeAdapterCCIP",
+        "label": "ccipExtraArgs",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_uint64,t_bytes_storage)"
+      }
+    ],
+    "types": {
+      "t_bytes_storage": {
+        "encoding": "bytes",
+        "label": "bytes",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_uint64,t_bytes_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint64",
+        "label": "mapping(uint64 => bytes)",
+        "numberOfBytes": "32",
+        "value": "t_bytes_storage"
+      },
+      "t_uint64": {
+        "encoding": "inplace",
+        "label": "uint64",
+        "numberOfBytes": "8"
+      }
+    }
+  }
+}

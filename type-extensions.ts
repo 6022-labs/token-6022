@@ -1,23 +1,49 @@
-import 'hardhat/types/config'
+import "hardhat/types/config";
 
-interface OftAdapterConfig {
-    tokenAddress: string
+interface BridgeCoreConfig {
+  type: "canonical" | "satellite";
+  tokenAddress?: string;
 }
 
-declare module 'hardhat/types/config' {
-    interface HardhatNetworkUserConfig {
-        oftAdapter?: never
-    }
+interface BridgeAdaptersConfig {
+  lz?: {
+    endpoint?: string;
+  };
+  ccip?: {
+    router?: string;
+  };
+}
 
-    interface HardhatNetworkConfig {
-        oftAdapter?: never
-    }
+interface BridgeGovernanceConfig {
+  owner?: string;
+}
 
-    interface HttpNetworkUserConfig {
-        oftAdapter?: OftAdapterConfig
-    }
+declare module "hardhat/types/config" {
+  interface HardhatNetworkUserConfig {
+    ccipChainSelector?: never;
+    bridgeCore?: never;
+    bridgeAdapters?: never;
+    bridgeGovernance?: never;
+  }
 
-    interface HttpNetworkConfig {
-        oftAdapter?: OftAdapterConfig
-    }
+  interface HardhatNetworkConfig {
+    ccipChainSelector?: never;
+    bridgeCore?: never;
+    bridgeAdapters?: never;
+    bridgeGovernance?: never;
+  }
+
+  interface HttpNetworkUserConfig {
+    ccipChainSelector?: string | bigint;
+    bridgeCore?: BridgeCoreConfig;
+    bridgeAdapters?: BridgeAdaptersConfig;
+    bridgeGovernance?: BridgeGovernanceConfig;
+  }
+
+  interface HttpNetworkConfig {
+    ccipChainSelector?: string | bigint;
+    bridgeCore?: BridgeCoreConfig;
+    bridgeAdapters?: BridgeAdaptersConfig;
+    bridgeGovernance?: BridgeGovernanceConfig;
+  }
 }

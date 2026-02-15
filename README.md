@@ -1,60 +1,186 @@
 # 6022 Token Contracts
 
-This repository holds the 6022 token contracts, deployment scripts, and tests. It targets Polygon Amoy as the home chain, uses Hardhat with `hardhat-deploy`, and integrates LayerZero V2 for cross-chain messaging.
+This repository contains the 6022 token contracts, deployment scripts, tests, and a Web3 bridge UI. It uses Hardhat + `hardhat-deploy` with a protocol-neutral bridge core and optional LayerZero / CCIP adapters.
 
 ## Components
 
-- **Token6022** (`contracts/Token6022.sol`): ERC20 token with symbol `6022`. The deployment script mints `1_000_000_000` tokens (18 decimals) to the deployer.
-- **Token6022OFT** (`contracts/Token6022OFT.sol`): Native LayerZero Omnichain Fungible Token (OFT) implementation. It is ownable by the deployer and starts with zero total supply, relying on cross-chain credits.
-- **Token6022OFTAdapter** (`contracts/Token6022OFTAdapter.sol`): Adapter that exposes an already-deployed ERC20 (such as `Token6022`) as an OFT without migrating balances.
+### Smart Contracts
 
-Deployment scripts in `deploy/` use `hardhat-deploy` tags that match the contract names. Tests in `test/` cover ERC20 behaviour, allowance flows, and OFT cross-chain transfers with mocked LayerZero endpoints. Token6022 and Token6022OFTAdapter are currently live on Polygon Amoy.
+- `Token6022BridgeCoreCanonical`: protocol-neutral lock/release core for canonical chain liquidity.
+- `Token6022BridgeCoreSatellite`: protocol-neutral mint/burn ERC20 core for satellite chains.
+- `Token6022BridgeAdapterLZ`: optional LayerZero transport adapter wired to one core.
+- `Token6022BridgeAdapterCCIP`: optional Chainlink CCIP transport adapter wired to one core.
+
+### Bridge UI
+
+A minimalist Web3 frontend for bridging tokens across chains. See [`bridge-ui/README.md`](bridge-ui/README.md) for setup instructions.
+
+Features:
+- Environment-configurable chain support
+- Wallet connection via Reown AppKit
+- Simple source/destination chain selection
+- Built with React + TypeScript + Vite
+
+## Architecture
+
+- `Token6022BridgeCoreCanonical`: protocol-neutral lock/release core for canonical chain liquidity.
+- `Token6022BridgeCoreSatellite`: protocol-neutral mint/burn ERC20 core for satellite chains.
+- `Token6022BridgeAdapterLZ`: optional LayerZero transport adapter wired to one core.
+- `Token6022BridgeAdapterCCIP`: optional Chainlink CCIP transport adapter wired to one core.
+
+With this split, core deployment is protocol-agnostic, and each transport can be deployed/wired independently.
+
+## Contracts
+
+- `contracts/Token6022.sol`: canonical ERC20 token (`6022`) with initial supply mint.
+- `contracts/Token6022BridgeCoreCanonical.sol`: canonical protocol-neutral core.
+- `contracts/Token6022BridgeCoreSatellite.sol`: satellite protocol-neutral core token.
+- `contracts/adapters/Token6022BridgeAdapterLZ.sol`: optional LayerZero transport adapter.
+- `contracts/adapters/Token6022BridgeAdapterCCIP.sol`: optional CCIP transport adapter.
 
 ## Setup
 
-1. Install dependencies: `pnpm install`
-2. Create `.env` with the deployer key (and optional RPC URLs):
+1. Install dependencies:
 
-	```
-	PRIVATE_KEY=0xabc...def
-	```
+```bash
+pnpm install
+```
+
+2. Create `.env`:
+
+```bash
+PRIVATE_KEY=0xabc...def
+RPC_URL_AMOY_TESTNET=
+RPC_URL_BASE_TESTNET=
+
+CCIP_ROUTER_AMOY_TESTNET=
+CCIP_ROUTER_BASE_TESTNET=
+
+# https://docs.chain.link/cre/reference/sdk/evm-client-ts
+CCIP_CHAIN_SELECTOR_AMOY_TESTNET=16281711391670634445
+CCIP_CHAIN_SELECTOR_BASE_TESTNET=10344971235874465080
+
+# Governance owners (Safe/timelock addresses)
+BRIDGE_OWNER_AMOY_TESTNET=
+BRIDGE_OWNER_BASE_TESTNET=
+```
 
 3. Review `hardhat.config.ts`:
-	- Polygon Amoy includes the live Token6022 and adapter addresses.
-	- Provide `eid`, `url`, and `accounts` for every LayerZero-enabled network.
-	- Set `oftAdapter.tokenAddress` only on networks that already host the ERC20.
-4. Adjust `layerzero.testnet.config.ts` if you need a different omnichain mesh (default links Amoy, Avalanche Fuji, and Sepolia).
 
-## Build & Test
+- `bridgeCore.type` controls whether a network deploys canonical or satellite core.
+- `bridgeCore.tokenAddress` is required for canonical core.
+- `bridgeAdapters.lz` controls optional LZ adapter deployment.
+- `bridgeAdapters.ccip.router` controls optional CCIP adapter deployment.
+- `bridgeGovernance.owner` (or `BRIDGE_OWNER_*` env vars in `hardhat.config.ts`) sets the owner for bridge core contracts. Adapter admin actions are gated by the current core owner.
+
+## Bridge Configuration
+
+### 1) Deploy core (protocol-neutral)
+
+```bash
+npx hardhat deploy --network amoy-testnet --tags Token6022BridgeCoreCanonical
+npx hardhat deploy --network base-testnet --tags Token6022BridgeCoreSatellite
+```
+
+### 2) Deploy adapters (optional, per transport)
+
+```bash
+npx hardhat deploy --network amoy-testnet --tags Token6022BridgeAdapterLZ
+npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterLZ
+
+npx hardhat deploy --network amoy-testnet --tags Token6022BridgeAdapterCCIP
+npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
+```
+
+Adapter deploy scripts automatically authorize the deployed adapter on the local core via `setAdapter(adapter, true)`.
+When `bridgeGovernance.owner` is different from the deployer (for example a Safe), auto-authorization is skipped and must be executed by the configured owner.
+
+#### Replacing an adapter without redeploying core
+
+- Avoid `--reset` for adapter replacement: it reruns dependency scripts and can rerun core deployments.
+- Replace adapter-only by removing the adapter deployment record, then deploying only that tag:
+
+```bash
+rm deployments/base-testnet/Token6022BridgeAdapterCCIP.json
+npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
+```
+
+### 3) Wire LayerZero (optional)
+
+- Topology is configured in `layerzero.testnet.config.ts`.
+- Apply wiring per source network:
+
+```bash
+npx hardhat lz:wire --network amoy-testnet --lz-config layerzero.testnet.config.ts
+npx hardhat lz:wire --network base-testnet --lz-config layerzero.testnet.config.ts
+```
+
+### 4) Wire CCIP (optional)
+
+- Topology is configured in `ccip.testnet.config.ts`.
+- Apply CCIP wiring from that config on each source network:
+
+```bash
+npx hardhat ccip:wire --network amoy-testnet --ccip-config ccip.testnet.config.ts
+npx hardhat ccip:wire --network base-testnet --ccip-config ccip.testnet.config.ts
+```
+
+- Dry-run mode:
+
+```bash
+npx hardhat ccip:wire --network amoy-testnet --ccip-config ccip.testnet.config.ts --dry-run
+```
+
+- Under the hood this writes:
+  - `setCcipPeer(uint64 chainSelector, bytes peer)` (EVM adapters use `abi.encode(address)`)
+  - `setCcipExtraArgs(uint64 chainSelector, bytes extraArgs)` (when configured)
+- Sending uses:
+  - `sendWithLz(...)` on `Token6022BridgeAdapterLZ`
+  - `sendWithCcip(...)` on `Token6022BridgeAdapterCCIP`
+
+### 5) Send bridge transfers (optional)
+
+LayerZero:
+
+```bash
+npx hardhat lz:send \
+  --network amoy-testnet \
+  --dst-eid 40245 \
+  --to 0xYourRecipient \
+  --amount 1
+```
+
+CCIP:
+
+```bash
+npx hardhat ccip:send \
+  --network amoy-testnet \
+  --dst-chain-selector 10344971235874465080 \
+  --to 0xYourRecipient \
+  --amount 1
+```
+
+Notes:
+
+- Both tasks auto-generate a `transferId` unless you pass `--transfer-id`.
+- Both tasks auto-approve canonical token allowance to `Token6022BridgeCoreCanonical` if needed.
+- `lz:send` uses `--options 0x` by default, which falls back to stored `lzSendOptions`.
+- LayerZero sends/quotes revert when resolved options are empty, so configure non-empty `lzSendOptions` (or pass explicit `--options`).
+
+### 6) Diagnose wiring + live quotes (optional)
+
+```bash
+npx hardhat bridge:diagnostics --network amoy-testnet --to 0xYourRecipient
+npx hardhat bridge:diagnostics --network amoy-testnet --to 0xYourRecipient --protocol lz
+```
+
+This task prints configured vs expected peers/options (LZ) and peers/extraArgs (CCIP), then performs a live fee quote per outbound route on the current source network.
+
+## Build and Test
 
 ```bash
 npx hardhat compile
 npx hardhat test
 ```
 
-The suite verifies deployment supply, transfers, approvals, and OFT cross-chain behaviour via mocked endpoints.
-
-## Deployments
-
-Use the LayerZero deployment task to orchestrate omnichain deployments defined in your config:
-
-```bash
-npx hardhat lz:deploy --tags Token6022OFT,Token6022OFTAdapter
-npx hardhat lz:deploy --help
-```
-
-Ensure `oftAdapter.tokenAddress` is populated on networks that already host Token6022, and configure peers after deployment (for example `npx hardhat lz:set-knit ...`).
-
-## Useful Hardhat tasks
-
-- `npx hardhat accounts`
-- `npx hardhat compile --force`
-- `npx hardhat clean`
-
-## Troubleshooting
-
-- Ensure EndpointV2 mocks or addresses are deployed before running OFT tests or deployments.
-- The adapter script skips execution when no `oftAdapter.tokenAddress` is provided for the current network.
-- If tests fail with insufficient gas, delete `cache/` and `artifacts/`, then recompile.
-
-For detailed LayerZero documentation see the [LayerZero developer portal](https://layerzero.network/developers).
+Current tests cover ERC20 behavior and bridge flows for canonical/satellite cores and both adapters.

@@ -1,65 +1,69 @@
-import { EndpointId } from '@layerzerolabs/lz-definitions'
-import { ExecutorOptionType } from '@layerzerolabs/lz-v2-utilities'
-import { generateConnectionsConfig, type TwoWayConfig } from '@layerzerolabs/metadata-tools'
+import { EndpointId } from "@layerzerolabs/lz-definitions";
+import { Options } from "@layerzerolabs/lz-v2-utilities";
 
-import type { OAppEnforcedOption, OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
+import {
+  LzPointHardhat,
+  LzTwoWayConfig,
+  LzOmniGraphHardhat,
+  generateLzConnectionsConfig,
+} from "./tasks/lz-config";
 
-/**
- *  WARNING: ONLY 1 OFTAdapter should exist for a given global mesh.
- *  The token address for the adapter should be defined in hardhat.config. This will be used in deployment.
- *
- *  for example:
- *
- *    sepolia: {
- *         eid: EndpointId.SEPOLIA_V2_TESTNET,
- *         url: process.env.RPC_URL_SEPOLIA || 'https://rpc.sepolia.org/',
- *         accounts,
- *         oftAdapter: {
- *             tokenAddress: '0x0', // Set the token address for the OFT adapter
- *         },
- *     },
- */
-const baseTestnetContract: OmniPointHardhat = {
-    eid: EndpointId.BASESEP_V2_TESTNET,
-    contractName: 'Token6022OFT',
-}
+const baseTestnetContract: LzPointHardhat = {
+  network: "base-testnet",
+  eid: EndpointId.BASESEP_V2_TESTNET,
+  contractName: "Token6022BridgeAdapterLZ",
+};
 
-const amoyTestnetContract: OmniPointHardhat = {
-    eid: EndpointId.AMOY_V2_TESTNET,
-    contractName: 'Token6022OFTAdapter',
-}
+const amoyTestnetContract: LzPointHardhat = {
+  network: "amoy-testnet",
+  eid: EndpointId.AMOY_V2_TESTNET,
+  contractName: "Token6022BridgeAdapterLZ",
+};
 
-const EVM_ENFORCED_OPTIONS: OAppEnforcedOption[] = [
-    {
-        msgType: 1,
-        optionType: ExecutorOptionType.LZ_RECEIVE,
-        gas: 80000,
-        value: 0,
-    },
-]
+const citreaTestnetContract: LzPointHardhat = {
+  network: "citrea-testnet",
+  eid: EndpointId.CITREA_V2_TESTNET,
+  contractName: "Token6022BridgeAdapterLZ",
+};
 
-const pathways: TwoWayConfig[] = [
-    [
-        baseTestnetContract,
-        amoyTestnetContract,
-        [['LayerZero Labs'], []],
-        [1, 1],
-        [EVM_ENFORCED_OPTIONS, EVM_ENFORCED_OPTIONS],
+const DEFAULT_LZ_OPTIONS = Options.newOptions()
+  .addExecutorLzReceiveOption(200000, 0)
+  .toHex()
+  .toString();
+
+const pathways: LzTwoWayConfig[] = [
+  [
+    baseTestnetContract,
+    amoyTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
+  [
+    amoyTestnetContract,
+    citreaTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
+  [
+    baseTestnetContract,
+    citreaTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
+];
+
+export default async function (): Promise<LzOmniGraphHardhat> {
+  const connections = generateLzConnectionsConfig(pathways);
+
+  return {
+    contracts: [
+      {
+        contract: baseTestnetContract,
+      },
+      {
+        contract: amoyTestnetContract,
+      },
+      {
+        contract: citreaTestnetContract,
+      },
     ],
-]
-
-export default async function (): Promise<OAppOmniGraphHardhat> {
-    const connections = await generateConnectionsConfig(pathways)
-
-    return {
-        contracts: [
-            {
-                contract: baseTestnetContract,
-            },
-            {
-                contract: amoyTestnetContract,
-            },
-        ],
-        connections,
-    }
+    connections,
+  };
 }
