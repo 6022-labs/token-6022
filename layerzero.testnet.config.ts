@@ -8,12 +8,6 @@ import {
   generateLzConnectionsConfig,
 } from "./tasks/lz-config";
 
-const baseTestnetContract: LzPointHardhat = {
-  network: "base-testnet",
-  eid: EndpointId.BASESEP_V2_TESTNET,
-  contractName: "Token6022BridgeAdapterLZ",
-};
-
 const amoyTestnetContract: LzPointHardhat = {
   network: "amoy-testnet",
   eid: EndpointId.AMOY_V2_TESTNET,
@@ -26,8 +20,14 @@ const citreaTestnetContract: LzPointHardhat = {
   contractName: "Token6022BridgeAdapterLZ",
 };
 
-const sepoliaTestnetContract: LzPointHardhat = {
-  network: "sepolia-testnet",
+const baseSepoliaTestnetContract: LzPointHardhat = {
+  network: "base-sepolia-testnet",
+  eid: EndpointId.BASESEP_V2_TESTNET,
+  contractName: "Token6022BridgeAdapterLZ",
+};
+
+const ethereumSepoliaTestnetContract: LzPointHardhat = {
+  network: "ethereum-sepolia-testnet",
   eid: EndpointId.SEPOLIA_V2_TESTNET,
   contractName: "Token6022BridgeAdapterLZ",
 };
@@ -39,7 +39,7 @@ const DEFAULT_LZ_OPTIONS = Options.newOptions()
 
 const pathways: LzTwoWayConfig[] = [
   [
-    baseTestnetContract,
+    baseSepoliaTestnetContract,
     amoyTestnetContract,
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
@@ -49,23 +49,23 @@ const pathways: LzTwoWayConfig[] = [
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
   [
-    baseTestnetContract,
+    baseSepoliaTestnetContract,
     citreaTestnetContract,
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
   [
-    baseTestnetContract,
-    sepoliaTestnetContract,
+    baseSepoliaTestnetContract,
+    ethereumSepoliaTestnetContract,
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
   [
     amoyTestnetContract,
-    sepoliaTestnetContract,
+    ethereumSepoliaTestnetContract,
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
   [
     citreaTestnetContract,
-    sepoliaTestnetContract,
+    ethereumSepoliaTestnetContract,
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
 ];
@@ -76,16 +76,16 @@ export default async function (): Promise<LzOmniGraphHardhat> {
   return {
     contracts: [
       {
-        contract: baseTestnetContract,
-      },
-      {
         contract: amoyTestnetContract,
       },
       {
         contract: citreaTestnetContract,
       },
       {
-        contract: sepoliaTestnetContract,
+        contract: baseSepoliaTestnetContract,
+      },
+      {
+        contract: ethereumSepoliaTestnetContract,
       },
     ],
     connections,

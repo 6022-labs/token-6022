@@ -16,6 +16,7 @@ This repository contains the 6022 token contracts, deployment scripts, tests, an
 A minimalist Web3 frontend for bridging tokens across chains. See [`bridge-ui/README.md`](bridge-ui/README.md) for setup instructions.
 
 Features:
+
 - Environment-configurable chain support
 - Wallet connection via Reown AppKit
 - Simple source/destination chain selection
@@ -51,18 +52,18 @@ pnpm install
 ```bash
 PRIVATE_KEY=0xabc...def
 RPC_URL_AMOY_TESTNET=
-RPC_URL_BASE_TESTNET=
+RPC_URL_BASE_SEPOLIA_TESTNET=
 
 CCIP_ROUTER_AMOY_TESTNET=
-CCIP_ROUTER_BASE_TESTNET=
+CCIP_ROUTER_BASE_SEPOLIA_TESTNET=
 
 # https://docs.chain.link/cre/reference/sdk/evm-client-ts
 CCIP_CHAIN_SELECTOR_AMOY_TESTNET=16281711391670634445
-CCIP_CHAIN_SELECTOR_BASE_TESTNET=10344971235874465080
+CCIP_CHAIN_SELECTOR_BASE_SEPOLIA_TESTNET=10344971235874465080
 
 # Governance owners (Safe/timelock addresses)
 BRIDGE_OWNER_AMOY_TESTNET=
-BRIDGE_OWNER_BASE_TESTNET=
+BRIDGE_OWNER_BASE_SEPOLIA_TESTNET=
 ```
 
 3. Review `hardhat.config.ts`:
@@ -79,17 +80,17 @@ BRIDGE_OWNER_BASE_TESTNET=
 
 ```bash
 npx hardhat deploy --network amoy-testnet --tags Token6022BridgeCoreCanonical
-npx hardhat deploy --network base-testnet --tags Token6022BridgeCoreSatellite
+npx hardhat deploy --network base-sepolia-testnet --tags Token6022BridgeCoreSatellite
 ```
 
 ### 2) Deploy adapters (optional, per transport)
 
 ```bash
 npx hardhat deploy --network amoy-testnet --tags Token6022BridgeAdapterLZ
-npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterLZ
+npx hardhat deploy --network base-sepolia-testnet --tags Token6022BridgeAdapterLZ
 
 npx hardhat deploy --network amoy-testnet --tags Token6022BridgeAdapterCCIP
-npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
+npx hardhat deploy --network base-sepolia-testnet --tags Token6022BridgeAdapterCCIP
 ```
 
 Adapter deploy scripts automatically authorize the deployed adapter on the local core via `setAdapter(adapter, true)`.
@@ -101,8 +102,8 @@ When `bridgeGovernance.owner` is different from the deployer (for example a Safe
 - Replace adapter-only by removing the adapter deployment record, then deploying only that tag:
 
 ```bash
-rm deployments/base-testnet/Token6022BridgeAdapterCCIP.json
-npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
+rm deployments/base-sepolia-testnet/Token6022BridgeAdapterCCIP.json
+npx hardhat deploy --network base-sepolia-testnet --tags Token6022BridgeAdapterCCIP
 ```
 
 ### 3) Wire LayerZero (optional)
@@ -112,7 +113,7 @@ npx hardhat deploy --network base-testnet --tags Token6022BridgeAdapterCCIP
 
 ```bash
 npx hardhat lz:wire --network amoy-testnet --lz-config layerzero.testnet.config.ts
-npx hardhat lz:wire --network base-testnet --lz-config layerzero.testnet.config.ts
+npx hardhat lz:wire --network base-sepolia-testnet --lz-config layerzero.testnet.config.ts
 ```
 
 ### 4) Wire CCIP (optional)
@@ -122,7 +123,7 @@ npx hardhat lz:wire --network base-testnet --lz-config layerzero.testnet.config.
 
 ```bash
 npx hardhat ccip:wire --network amoy-testnet --ccip-config ccip.testnet.config.ts
-npx hardhat ccip:wire --network base-testnet --ccip-config ccip.testnet.config.ts
+npx hardhat ccip:wire --network base-sepolia-testnet --ccip-config ccip.testnet.config.ts
 ```
 
 - Dry-run mode:

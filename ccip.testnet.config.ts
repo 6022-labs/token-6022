@@ -11,24 +11,20 @@ import {
  */
 const CCIP_CHAIN_SELECTOR_ADI_TESTNET =
   process.env.CCIP_CHAIN_SELECTOR_ADI_TESTNET ?? "9418205736192840573";
-const CCIP_CHAIN_SELECTOR_BASE_TESTNET =
-  process.env.CCIP_CHAIN_SELECTOR_BASE_TESTNET ?? "10344971235874465080";
 const CCIP_CHAIN_SELECTOR_AMOY_TESTNET =
   process.env.CCIP_CHAIN_SELECTOR_AMOY_TESTNET ?? "16281711391670634445";
 const CCIP_CHAIN_SELECTOR_CITREA_TESTNET =
   process.env.CCIP_CHAIN_SELECTOR_CITREA_TESTNET;
-const CCIP_CHAIN_SELECTOR_SEPOLIA_TESTNET =
-  process.env.CCIP_CHAIN_SELECTOR_SEPOLIA_TESTNET ?? "16015286601757825753";
+const CCIP_CHAIN_SELECTOR_BASE_SEPOLIA_TESTNET =
+  process.env.CCIP_CHAIN_SELECTOR_BASE_SEPOLIA_TESTNET ??
+  "10344971235874465080";
+const CCIP_CHAIN_SELECTOR_ETHEREUM_SEPOLIA_TESTNET =
+  process.env.CCIP_CHAIN_SELECTOR_ETHEREUM_SEPOLIA_TESTNET ??
+  "16015286601757825753";
 
 const adiTestnetContract: CcipPointHardhat = {
   network: "adi-testnet",
   chainSelector: CCIP_CHAIN_SELECTOR_ADI_TESTNET,
-  contractName: "Token6022BridgeAdapterCCIP",
-};
-
-const baseTestnetContract: CcipPointHardhat = {
-  network: "base-testnet",
-  chainSelector: CCIP_CHAIN_SELECTOR_BASE_TESTNET,
   contractName: "Token6022BridgeAdapterCCIP",
 };
 
@@ -46,9 +42,15 @@ const amoyTestnetContract: CcipPointHardhat = {
 //   contractName: "Token6022BridgeAdapterCCIP",
 // };
 
-const sepoliaTestnetContract: CcipPointHardhat = {
-  network: "sepolia-testnet",
-  chainSelector: CCIP_CHAIN_SELECTOR_SEPOLIA_TESTNET,
+const baseSepoliaTestnetContract: CcipPointHardhat = {
+  network: "base-sepolia-testnet",
+  chainSelector: CCIP_CHAIN_SELECTOR_BASE_SEPOLIA_TESTNET,
+  contractName: "Token6022BridgeAdapterCCIP",
+};
+
+const ethereumSepoliaTestnetContract: CcipPointHardhat = {
+  network: "ethereum-sepolia-testnet",
+  chainSelector: CCIP_CHAIN_SELECTOR_ETHEREUM_SEPOLIA_TESTNET,
   contractName: "Token6022BridgeAdapterCCIP",
 };
 
@@ -56,13 +58,13 @@ const DEFAULT_CCIP_EXTRA_ARGS = "0x";
 
 const pathways: CcipTwoWayConfig[] = [
   [
-    baseTestnetContract,
+    baseSepoliaTestnetContract,
     amoyTestnetContract,
     [DEFAULT_CCIP_EXTRA_ARGS, DEFAULT_CCIP_EXTRA_ARGS],
   ],
   [
     adiTestnetContract,
-    baseTestnetContract,
+    baseSepoliaTestnetContract,
     [DEFAULT_CCIP_EXTRA_ARGS, DEFAULT_CCIP_EXTRA_ARGS],
   ],
   [
@@ -92,17 +94,17 @@ const pathways: CcipTwoWayConfig[] = [
   //   [DEFAULT_CCIP_EXTRA_ARGS, DEFAULT_CCIP_EXTRA_ARGS],
   // ],
   [
-    sepoliaTestnetContract,
-    baseTestnetContract,
+    ethereumSepoliaTestnetContract,
+    baseSepoliaTestnetContract,
     [DEFAULT_CCIP_EXTRA_ARGS, DEFAULT_CCIP_EXTRA_ARGS],
   ],
   [
-    sepoliaTestnetContract,
+    ethereumSepoliaTestnetContract,
     amoyTestnetContract,
     [DEFAULT_CCIP_EXTRA_ARGS, DEFAULT_CCIP_EXTRA_ARGS],
   ],
   [
-    sepoliaTestnetContract,
+    ethereumSepoliaTestnetContract,
     adiTestnetContract,
     [DEFAULT_CCIP_EXTRA_ARGS, DEFAULT_CCIP_EXTRA_ARGS],
   ],
@@ -117,7 +119,7 @@ export default async function (): Promise<CcipOmniGraphHardhat> {
         contract: adiTestnetContract,
       },
       {
-        contract: baseTestnetContract,
+        contract: baseSepoliaTestnetContract,
       },
       {
         contract: amoyTestnetContract,
@@ -127,7 +129,7 @@ export default async function (): Promise<CcipOmniGraphHardhat> {
       //   contract: citreaTestnetContract,
       // },
       {
-        contract: sepoliaTestnetContract,
+        contract: ethereumSepoliaTestnetContract,
       },
     ],
     connections,
