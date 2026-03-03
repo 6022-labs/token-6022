@@ -26,6 +26,12 @@ const citreaTestnetContract: LzPointHardhat = {
   contractName: "Token6022BridgeAdapterLZ",
 };
 
+const sepoliaTestnetContract: LzPointHardhat = {
+  network: "sepolia-testnet",
+  eid: EndpointId.SEPOLIA_V2_TESTNET,
+  contractName: "Token6022BridgeAdapterLZ",
+};
+
 const DEFAULT_LZ_OPTIONS = Options.newOptions()
   .addExecutorLzReceiveOption(200000, 0)
   .toHex()
@@ -47,6 +53,21 @@ const pathways: LzTwoWayConfig[] = [
     citreaTestnetContract,
     [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
   ],
+  [
+    baseTestnetContract,
+    sepoliaTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
+  [
+    amoyTestnetContract,
+    sepoliaTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
+  [
+    citreaTestnetContract,
+    sepoliaTestnetContract,
+    [DEFAULT_LZ_OPTIONS, DEFAULT_LZ_OPTIONS],
+  ],
 ];
 
 export default async function (): Promise<LzOmniGraphHardhat> {
@@ -62,6 +83,9 @@ export default async function (): Promise<LzOmniGraphHardhat> {
       },
       {
         contract: citreaTestnetContract,
+      },
+      {
+        contract: sepoliaTestnetContract,
       },
     ],
     connections,

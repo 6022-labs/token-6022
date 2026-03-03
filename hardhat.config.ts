@@ -17,18 +17,29 @@ import "./tasks/bridge-send";
 import "./tasks/lz-wire";
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+
+const CCIP_ROUTER_ADI_TESTNET = process.env.CCIP_ROUTER_ADI_TESTNET;
 const CCIP_ROUTER_AMOY_TESTNET = process.env.CCIP_ROUTER_AMOY_TESTNET;
 const CCIP_ROUTER_BASE_TESTNET = process.env.CCIP_ROUTER_BASE_TESTNET;
 const CCIP_ROUTER_CITREA_TESTNET = process.env.CCIP_ROUTER_CITREA_TESTNET;
+const CCIP_ROUTER_SEPOLIA_TESTNET = process.env.CCIP_ROUTER_SEPOLIA_TESTNET;
+
+const CCIP_CHAIN_SELECTOR_ADI_TESTNET =
+  process.env.CCIP_CHAIN_SELECTOR_ADI_TESTNET ?? "9418205736192840573";
 const CCIP_CHAIN_SELECTOR_AMOY_TESTNET =
   process.env.CCIP_CHAIN_SELECTOR_AMOY_TESTNET ?? "16281711391670634445";
 const CCIP_CHAIN_SELECTOR_BASE_TESTNET =
   process.env.CCIP_CHAIN_SELECTOR_BASE_TESTNET ?? "10344971235874465080";
 const CCIP_CHAIN_SELECTOR_CITREA_TESTNET =
-  process.env.CCIP_CHAIN_SELECTOR_CITREA_TESTNET;
+  process.env.CCIP_CHAIN_SELECTOR_CITREA_TESTNET ?? ""; // CCIP does not support citrea yet
+const CCIP_CHAIN_SELECTOR_SEPOLIA_TESTNET =
+  process.env.CCIP_CHAIN_SELECTOR_SEPOLIA_TESTNET ?? "16015286601757825753";
+
+const BRIDGE_OWNER_ADI_TESTNET = process.env.BRIDGE_OWNER_ADI_TESTNET;
 const BRIDGE_OWNER_AMOY_TESTNET = process.env.BRIDGE_OWNER_AMOY_TESTNET;
 const BRIDGE_OWNER_BASE_TESTNET = process.env.BRIDGE_OWNER_BASE_TESTNET;
 const BRIDGE_OWNER_CITREA_TESTNET = process.env.BRIDGE_OWNER_CITREA_TESTNET;
+const BRIDGE_OWNER_SEPOLIA_TESTNET = process.env.BRIDGE_OWNER_SEPOLIA_TESTNET;
 
 const account: string = PRIVATE_KEY ?? "";
 
@@ -136,6 +147,57 @@ const config: HardhatUserConfig = {
         ? {
             bridgeGovernance: {
               owner: BRIDGE_OWNER_CITREA_TESTNET,
+            },
+          }
+        : {}),
+    },
+    "adi-testnet": {
+      ccipChainSelector: CCIP_CHAIN_SELECTOR_ADI_TESTNET,
+      url: process.env.RPC_URL_ADI_TESTNET || "https://testnet.adi.gg",
+      accounts: [account],
+      bridgeCore: {
+        type: "satellite",
+      },
+      bridgeAdapters: {
+        lz: {},
+        ...(CCIP_ROUTER_ADI_TESTNET
+          ? {
+              ccip: {
+                router: CCIP_ROUTER_ADI_TESTNET,
+              },
+            }
+          : {}),
+      },
+      ...(BRIDGE_OWNER_ADI_TESTNET
+        ? {
+            bridgeGovernance: {
+              owner: BRIDGE_OWNER_ADI_TESTNET,
+            },
+          }
+        : {}),
+    },
+    "sepolia-testnet": {
+      eid: EndpointId.SEPOLIA_V2_TESTNET,
+      ccipChainSelector: CCIP_CHAIN_SELECTOR_SEPOLIA_TESTNET,
+      url: process.env.RPC_URL_SEPOLIA_TESTNET || "https://rpc.sepolia.org",
+      accounts: [account],
+      bridgeCore: {
+        type: "satellite",
+      },
+      bridgeAdapters: {
+        lz: {},
+        ...(CCIP_ROUTER_SEPOLIA_TESTNET
+          ? {
+              ccip: {
+                router: CCIP_ROUTER_SEPOLIA_TESTNET,
+              },
+            }
+          : {}),
+      },
+      ...(BRIDGE_OWNER_SEPOLIA_TESTNET
+        ? {
+            bridgeGovernance: {
+              owner: BRIDGE_OWNER_SEPOLIA_TESTNET,
             },
           }
         : {}),
